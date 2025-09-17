@@ -8,9 +8,13 @@ TEMPLATE = app               # Type de projet : application
 # ---------------------
 SOURCES += ../src/cpp/main.cpp \
            ../src/cpp/Emulator.cpp \
+           ../src/cpp/EmulatorWidget.cpp \
+           ../src/cpp/Carousel.cpp # Ajouté
 
 # ---------------------
 # Headers H
 # ---------------------
 HEADERS += ../src/headers/Emulator.h \
-           ../src/headers/Constants.h
+           ../src/headers/EmulatorWidget.h \
+           ../src/headers/Constants.h \
+           ../src/headers/Carousel.h # Ajouté
