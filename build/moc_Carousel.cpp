@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_Carousel_t {
-    QByteArrayData data[1];
-    char stringdata0[9];
+    QByteArrayData data[7];
+    char stringdata0[72];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -32,10 +32,17 @@ struct qt_meta_stringdata_Carousel_t {
     )
 static const qt_meta_stringdata_Carousel_t qt_meta_stringdata_Carousel = {
     {
-QT_MOC_LITERAL(0, 0, 8) // "Carousel"
+QT_MOC_LITERAL(0, 0, 8), // "Carousel"
+QT_MOC_LITERAL(1, 9, 22), // "handleControllerButton"
+QT_MOC_LITERAL(2, 32, 0), // ""
+QT_MOC_LITERAL(3, 33, 6), // "button"
+QT_MOC_LITERAL(4, 40, 20), // "handleControllerAxis"
+QT_MOC_LITERAL(5, 61, 4), // "axis"
+QT_MOC_LITERAL(6, 66, 5) // "value"
 
     },
-    "Carousel"
+    "Carousel\0handleControllerButton\0\0"
+    "button\0handleControllerAxis\0axis\0value"
 };
 #undef QT_MOC_LITERAL
 
@@ -45,22 +52,35 @@ static const uint qt_meta_data_Carousel[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-       0,    0, // methods
+       2,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
        0,       // signalCount
 
+ // slots: name, argc, parameters, tag, flags
+       1,    1,   24,    2, 0x0a /* Public */,
+       4,    2,   27,    2, 0x0a /* Public */,
+
+ // slots: parameters
+    QMetaType::Void, QMetaType::Int,    3,
+    QMetaType::Void, QMetaType::Int, QMetaType::Int,    5,    6,
+
        0        // eod
 };
 
 void Carousel::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
-    (void)_o;
-    (void)_id;
-    (void)_c;
-    (void)_a;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        auto *_t = static_cast<Carousel *>(_o);
+        (void)_t;
+        switch (_id) {
+        case 0: _t->handleControllerButton((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 1: _t->handleControllerAxis((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        default: ;
+        }
+    }
 }
 
 QT_INIT_METAOBJECT const QMetaObject Carousel::staticMetaObject = { {
@@ -89,6 +109,17 @@ void *Carousel::qt_metacast(const char *_clname)
 int Carousel::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
     _id = QWidget::qt_metacall(_c, _id, _a);
+    if (_id < 0)
+        return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        if (_id < 2)
+            qt_static_metacall(this, _c, _id, _a);
+        _id -= 2;
+    } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
+        if (_id < 2)
+            *reinterpret_cast<int*>(_a[0]) = -1;
+        _id -= 2;
+    }
     return _id;
 }
 QT_WARNING_POP

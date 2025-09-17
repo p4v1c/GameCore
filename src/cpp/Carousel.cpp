@@ -51,6 +51,40 @@ void Carousel::keyPressEvent(QKeyEvent *event) {
   updateVisibleWidgets();
 }
 
+
+void Carousel::handleControllerButton(int button) {
+    if (emuWidgets.empty())
+        return;
+
+    if (button == SDL_CONTROLLER_BUTTON_DPAD_RIGHT) {
+        selectedIndex = (selectedIndex + 1) % emuWidgets.size();
+        updateVisibleWidgets();
+    } else if (button == SDL_CONTROLLER_BUTTON_DPAD_LEFT) {
+        selectedIndex = (selectedIndex - 1 + emuWidgets.size()) % emuWidgets.size();
+        updateVisibleWidgets();
+    }
+}
+
+void Carousel::handleControllerAxis(int axis, int value) {
+    if (emuWidgets.empty() || axis != SDL_CONTROLLER_AXIS_LEFTX)
+        return;
+
+    const int THRESHOLD = 16000;
+
+    // Mouvement vers la droite
+    if (value > THRESHOLD && lastAxisValue <= THRESHOLD) {
+        selectedIndex = (selectedIndex + 1) % emuWidgets.size();
+        updateVisibleWidgets();
+    }
+    // Mouvement vers la gauche
+    else if (value < -THRESHOLD && lastAxisValue >= -THRESHOLD) {
+        selectedIndex = (selectedIndex - 1 + emuWidgets.size()) % emuWidgets.size();
+        updateVisibleWidgets();
+    }
+
+    lastAxisValue = value;
+}
+
 void Carousel::updateVisibleWidgets() {
   QHBoxLayout *layout = qobject_cast<QHBoxLayout *>(this->layout());
   if (!layout)

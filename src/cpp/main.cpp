@@ -7,7 +7,7 @@
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QWidget>
-#include <QStatusBar> // Inclure QStatusBar
+#include <QStatusBar>
 
 #include "../headers/Carousel.h"
 #include "../headers/Constants.h"
@@ -18,7 +18,7 @@
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
 
-    // ----- FENETRE PRINCIPALE -----
+    // ----- FENÊTRE PRINCIPALE -----
     QWidget window;
     window.setWindowTitle("RetroLauncher");
     window.showFullScreen();
@@ -30,17 +30,15 @@ int main(int argc, char *argv[]) {
 
     // ----- CRÉATION DE LA BARRE DE STATUT -----
     QStatusBar *statusBar = new QStatusBar(&window);
-    // Style de la barre de statut : plus grande
     statusBar->setStyleSheet("color: white; font-size: 16px; background: transparent; padding: 5px;");
-    statusBar->setSizeGripEnabled(false); // Désactiver le redimensionnement
+    statusBar->setSizeGripEnabled(false);
     mainLayout->addWidget(statusBar);
-    statusBar->showMessage("En attente de manette...", 0); // Message initial permanent
+    statusBar->showMessage("En attente de manette...", 0);
 
     // ----- INITIALISATION DU MANAGER DE MANETTE -----
     ControllerManager controllerManager;
     controllerManager.initialize();
 
-    // Connecter les signaux du manager de manette à la barre de statut
     QObject::connect(&controllerManager, &ControllerManager::controllerConnected,
                      statusBar, [statusBar](const QString &name) {
         statusBar->showMessage(QString("Manette '%1' détectée !").arg(name), 5000);
@@ -50,10 +48,9 @@ int main(int argc, char *argv[]) {
         statusBar->showMessage("Manette déconnectée.", 5000);
     });
 
-    // Utiliser un QTimer pour vérifier les événements de la manette en continu
     QTimer controllerTimer;
     QObject::connect(&controllerTimer, &QTimer::timeout, &controllerManager, &ControllerManager::processEvents);
-    controllerTimer.start(16); // Vérification à ~60 FPS
+    controllerTimer.start(16);
 
     // ----- SPLASH "GAME CORE" -----
     QLabel *gameCoreLabel = new QLabel();
@@ -103,11 +100,16 @@ int main(int argc, char *argv[]) {
             carousel->setFocusPolicy(Qt::StrongFocus);
             carousel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
+            // CONNEXION DES SIGNAUX APRÈS LA CRÉATION DU CAROUSEL
+            QObject::connect(&controllerManager, &ControllerManager::buttonPressed,
+                             carousel, &Carousel::handleControllerButton);
+            QObject::connect(&controllerManager, &ControllerManager::axisMoved,
+                             carousel, &Carousel::handleControllerAxis);
+
             mainLayout->addStretch();
             mainLayout->addWidget(carousel, 0, Qt::AlignCenter);
             mainLayout->addStretch();
 
-            // Réinsérer la barre de statut en bas
             mainLayout->addWidget(statusBar);
 
             carousel->scanEmulators("../emu");
