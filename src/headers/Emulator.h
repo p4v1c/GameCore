@@ -6,10 +6,18 @@
 #include <vector>
 
 struct Emulator {
-  QString name;     // Nom du dossier/émulateur
-  QString path;     // Chemin complet
+  QString name;
+  QString path;
   QString platform; // Switch, SNES, etc.
   QPixmap icon;     // Icône
+
+  // Nouveau constructeur pour initialiser les membres
+  Emulator(const QString &name, const QString &path, const QString &platform,
+           const QPixmap &icon)
+      : name(name), path(path), platform(platform), icon(icon) {}
+
+  // Ajout d'un constructeur par défaut
+  Emulator() = default;
 };
 
 class EmulatorManager {

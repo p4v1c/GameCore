@@ -1,6 +1,6 @@
 #include <QApplication>
 #include <QGraphicsOpacityEffect>
-#include <QHBoxLayout>
+#include <QHBoxLayout> // Peut être nécessaire si Carousel utilise QHBoxLayout directement
 #include <QIcon>
 #include <QLabel>
 #include <QPropertyAnimation>
@@ -11,7 +11,11 @@
 #include "../headers/Carousel.h"
 #include "../headers/Constants.h"
 #include "../headers/Emulator.h"
-#include "../headers/EmulatorWidget.h" // Cette ligne est la solution
+#include "../headers/EmulatorWidget.h"
+
+// Note : Si vous utilisez toujours le ControllerManager et la QStatusBar,
+// vous devrez les réintégrer comme dans les versions précédentes.
+// Ce code est une version simplifiée sans ces éléments.
 
 int main(int argc, char *argv[]) {
   QApplication app(argc, argv);
@@ -65,22 +69,28 @@ int main(int argc, char *argv[]) {
 
     // ----- APRES LE SPLASH : AFFICHAGE DU CAROUSEL -----
     QTimer::singleShot(SPLASH_FADE_OUT_DURATION, [&mainLayout, &window]() {
+      // Nettoyer l'ancien contenu du layout (le splash screen)
       QLayoutItem *item;
       while ((item = mainLayout->takeAt(0)) != nullptr) {
-        delete item->widget();
+        if (item->widget()) { // S'assurer que l'item contient un widget avant
+                              // de le supprimer
+          delete item->widget();
+        }
         delete item;
       }
 
       Carousel *carousel = new Carousel(&window);
-      carousel->setFocusPolicy(Qt::StrongFocus);
+      carousel->setFocusPolicy(
+          Qt::StrongFocus); // Pour recevoir les événements clavier
       carousel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
       mainLayout->addStretch();
       mainLayout->addWidget(carousel, 0, Qt::AlignCenter);
       mainLayout->addStretch();
 
-      carousel->scanEmulators("../emu");
-      carousel->setFocus();
+      carousel->scanEmulators("../emu"); // Charger les émulateurs
+      carousel->setFocus(); // Donner le focus au carousel pour la navigation
+                            // clavier
     });
   });
 

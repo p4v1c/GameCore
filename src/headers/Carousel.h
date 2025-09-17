@@ -1,25 +1,29 @@
 #ifndef CAROUSEL_H
 #define CAROUSEL_H
 
-#include "Emulator.h"
-#include "EmulatorWidget.h"
-#include <QKeyEvent>
 #include <QWidget>
 #include <vector>
 
-class Carousel : public QWidget {
-  Q_OBJECT
+#include "../headers/Emulator.h"
+#include "../headers/EmulatorWidget.h" // Assurez-vous que cette inclusion est correcte si EmulatorWidget existe
 
-public:
-  explicit Carousel(QWidget *parent = nullptr);
+class Carousel : public QWidget {
+Q_OBJECT // <<-- INDISPENSABLE POUR LES SLOTS ET SIGNAUX
+
+    public : explicit Carousel(QWidget *parent = nullptr);
   void scanEmulators(const QString &path);
 
 protected:
   void keyPressEvent(QKeyEvent *event) override;
-  void updateSelection();
+
+public slots: // <<-- DOIT ÊTRE PRÉSENT ET CORRECTEMENT PLACÉ
+  void handleControllerButton(int button);
+  void handleControllerAxis(int axis, int value);
 
 private:
-  void updateVisibleWidgets(); // Ajout de la déclaration de la fonction
+  void updateVisibleWidgets();
+  void updateSelection();
+
   std::vector<EmulatorWidget *> emuWidgets;
   int selectedIndex;
 };
