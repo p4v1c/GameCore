@@ -1,6 +1,7 @@
 #include "../headers/Emulator.h"
 #include <QDebug>
 #include <QDir>
+#include <QPixmap>
 
 void EmulatorManager::scanEmulators(const QString &directory) {
   emulators.clear();
@@ -22,29 +23,91 @@ void EmulatorManager::scanEmulators(const QString &directory) {
     if (lower.contains("yuzu")) {
       emu.platform = "Switch";
       if (!emu.icon.load("../assets/logos/switch.png")) {
-        qDebug() << "Impossible de charger yuzu.png";
+        qDebug() << "Impossible de charger switch.png";
         emu.icon = QPixmap(128, 128);
         emu.icon.fill(Qt::gray);
       }
     } else if (lower.contains("dolphin")) {
-      emu.platform = "GameCube";
-      if (!emu.icon.load("../assets/logos/GameCube.png")) {
+      emu.platform = "GameCube/Wii";
+      if (!emu.icon.load("../assets/logos/gamecube.png")) {
+        qDebug() << "Impossible de charger gamecube.png";
         emu.icon = QPixmap(128, 128);
         emu.icon.fill(Qt::gray);
       }
-    } else if (lower.contains("snes")) {
+    } else if (lower.contains("bsnes")) {
       emu.platform = "SNES";
       if (!emu.icon.load("../assets/logos/snes.png")) {
+        qDebug() << "Impossible de charger snes.png";
         emu.icon = QPixmap(128, 128);
         emu.icon.fill(Qt::gray);
       }
-    } else {
-      emu.platform = "Unknown";
-      emu.icon = QPixmap(128, 128);
-      emu.icon.fill(Qt::gray);
+    } else if (lower.contains("pcsx2")) {
+      emu.platform = "PS2";
+      if (!emu.icon.load("../assets/logos/ps2.png")) {
+        qDebug() << "Impossible de charger ps2.png";
+        emu.icon = QPixmap(128, 128);
+        emu.icon.fill(Qt::gray);
+      }
+    } else if (lower.contains("rpcs3")) {
+      emu.platform = "PS3";
+      if (!emu.icon.load("../assets/logos/ps3.png")) {
+        qDebug() << "Impossible de charger ps3.png";
+        emu.icon = QPixmap(128, 128);
+        emu.icon.fill(Qt::gray);
+      }
+    } else if (lower.contains("duckstation")) {
+      emu.platform = "PS1";
+      if (!emu.icon.load("../assets/logos/ps1.png")) {
+        qDebug() << "Impossible de charger ps1.png";
+        emu.icon = QPixmap(128, 128);
+        emu.icon.fill(Qt::gray);
+      }
+    } else if (lower.contains("mgba")) {
+      emu.platform = "Game Boy";
+      if (!emu.icon.load("../assets/logos/gba.png")) {
+        qDebug() << "Impossible de charger gba.png";
+        emu.icon = QPixmap(128, 128);
+        emu.icon.fill(Qt::gray);
+      }
+    } else if (lower.contains("ppsspp")) {
+      emu.platform = "PSP";
+      if (!emu.icon.load("../assets/logos/psp.png")) {
+        qDebug() << "Impossible de charger psp.png";
+        emu.icon = QPixmap(128, 128);
+        emu.icon.fill(Qt::gray);
+      }
+    } else if (lower.contains("citra")) {
+      emu.platform = "3DS";
+      if (!emu.icon.load("../assets/logos/3ds.png")) {
+        qDebug() << "Impossible de charger 3ds.png";
+        emu.icon = QPixmap(128, 128);
+        emu.icon.fill(Qt::gray);
+      }
+    } else if (lower.contains("melonds")) {
+      emu.platform = "DS";
+      if (!emu.icon.load("../assets/logos/ds.png")) {
+        qDebug() << "Impossible de charger ds.png";
+        emu.icon = QPixmap(128, 128);
+        emu.icon.fill(Qt::gray);
+      }
+    } else if (lower.contains("mupen64plus")) {
+      emu.platform = "N64";
+      if (!emu.icon.load("../assets/logos/n64.png")) {
+        qDebug() << "Impossible de charger n64.png";
+        emu.icon = QPixmap(128, 128);
+        emu.icon.fill(Qt::gray);
+      }
+    } else if (lower.contains("fceux")) {
+      emu.platform = "NES";
+      if (!emu.icon.load("../assets/logos/nes.png")) {
+        qDebug() << "Impossible de charger nes.png";
+        emu.icon = QPixmap(128, 128);
+        emu.icon.fill(Qt::gray);
+      }
     }
-
-    emulators.push_back(emu);
+    if (!emu.platform.isEmpty() && !emu.icon.isNull()) {
+      emulators.push_back(emu);
+    }
   }
 }
 

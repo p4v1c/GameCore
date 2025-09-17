@@ -21,8 +21,8 @@ EmulatorWidget::EmulatorWidget(const Emulator &emu, QWidget *parent)
       "font-weight: bold;"
       "font-size: 28px;"
       "font-family: 'Arial';"
-      "border: 0px solid transparent;"); // Ajout de cette ligne pour enlever la
-                                         // bordure
+      "border: 0pchatx solid transparent;"); // Ajout de cette ligne pour
+                                             // enlever la bordure
 
   layout->addWidget(nameLabel, 0, Qt::AlignHCenter);
 

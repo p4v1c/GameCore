@@ -2,7 +2,7 @@
 #define CAROUSEL_H
 
 #include "Emulator.h"
-#include "EmulatorWidget.h" // La ligne manquante
+#include "EmulatorWidget.h"
 #include <QKeyEvent>
 #include <QWidget>
 #include <vector>
@@ -19,8 +19,9 @@ protected:
   void updateSelection();
 
 private:
+  void updateVisibleWidgets(); // Ajout de la déclaration de la fonction
   std::vector<EmulatorWidget *> emuWidgets;
   int selectedIndex;
 };
 
-#endif // CAROUSEL_Hendif // CAROUSEL_H
+#endif // CAROUSEL_H
