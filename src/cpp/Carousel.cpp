@@ -1,14 +1,17 @@
 #include "../headers/Carousel.h"
+#include "../headers/Emulator.h"
+#include <QDebug>
 #include <QGraphicsDropShadowEffect>
 #include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QPropertyAnimation>
 #include <QtMath>
+#include <SDL.h>
 
-// Définition du nombre d'émulateurs visibles à l'écran
 const int VISIBLE_WIDGETS_COUNT = 5;
 
-Carousel::Carousel(QWidget *parent) : QWidget(parent), selectedIndex(0) {
+Carousel::Carousel(QWidget *parent)
+    : QWidget(parent), selectedIndex(0), lastAxisValue(0) {
   setStyleSheet("background-color: #2E2E2E;");
   QHBoxLayout *layout = new QHBoxLayout(this);
   layout->setSpacing(50);
@@ -22,11 +25,9 @@ void Carousel::scanEmulators(const QString &path) {
   EmulatorManager emuManager;
   emuManager.scanEmulators(path);
 
-  // Vider la liste existante des widgets
   qDeleteAll(emuWidgets);
   emuWidgets.clear();
 
-  // Créer tous les widgets et les stocker en mémoire
   for (const Emulator &emu : emuManager.getEmulators()) {
     EmulatorWidget *w = new EmulatorWidget(emu, this);
     emuWidgets.push_back(w);
@@ -44,57 +45,68 @@ void Carousel::keyPressEvent(QKeyEvent *event) {
     selectedIndex = (selectedIndex + 1) % emuWidgets.size();
   } else if (event->key() == Qt::Key_Left) {
     selectedIndex = (selectedIndex - 1 + emuWidgets.size()) % emuWidgets.size();
+  } else if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
+    if (selectedIndex >= 0 &&
+        static_cast<size_t>(selectedIndex) < emuWidgets.size()) {
+      emit switchToGameList(emuWidgets[selectedIndex]->getEmulatorName());
+    }
   } else {
-    return; // Ne pas mettre à jour si la touche n'est pas une flèche
+    QWidget::keyPressEvent(event);
+    return;
   }
-
   updateVisibleWidgets();
+  updateSelection();
 }
 
-
 void Carousel::handleControllerButton(int button) {
-    if (emuWidgets.empty())
-        return;
+  if (emuWidgets.empty())
+    return;
 
-    if (button == SDL_CONTROLLER_BUTTON_DPAD_RIGHT) {
-        selectedIndex = (selectedIndex + 1) % emuWidgets.size();
-        updateVisibleWidgets();
-    } else if (button == SDL_CONTROLLER_BUTTON_DPAD_LEFT) {
-        selectedIndex = (selectedIndex - 1 + emuWidgets.size()) % emuWidgets.size();
-        updateVisibleWidgets();
+  if (button == SDL_CONTROLLER_BUTTON_DPAD_RIGHT) {
+    selectedIndex = (selectedIndex + 1) % emuWidgets.size();
+  } else if (button == SDL_CONTROLLER_BUTTON_DPAD_LEFT) {
+    selectedIndex = (selectedIndex - 1 + emuWidgets.size()) % emuWidgets.size();
+  } else if (button == SDL_CONTROLLER_BUTTON_A) { // Bouton Croix (X) de la PS4
+    if (selectedIndex >= 0 &&
+        static_cast<size_t>(selectedIndex) < emuWidgets.size()) {
+      emit switchToGameList(emuWidgets[selectedIndex]->getEmulatorName());
     }
+  }
+  updateVisibleWidgets();
+  updateSelection();
 }
 
 void Carousel::handleControllerAxis(int axis, int value) {
-    if (emuWidgets.empty() || axis != SDL_CONTROLLER_AXIS_LEFTX)
-        return;
+  if (emuWidgets.empty())
+    return;
 
-    const int THRESHOLD = 16000;
-
-    // Mouvement vers la droite
+  const int THRESHOLD = 16000;
+  if (axis == SDL_CONTROLLER_AXIS_LEFTX || axis == SDL_CONTROLLER_AXIS_RIGHTX) {
     if (value > THRESHOLD && lastAxisValue <= THRESHOLD) {
-        selectedIndex = (selectedIndex + 1) % emuWidgets.size();
-        updateVisibleWidgets();
+      selectedIndex = (selectedIndex + 1) % emuWidgets.size();
+    } else if (value < -THRESHOLD && lastAxisValue >= -THRESHOLD) {
+      selectedIndex =
+          (selectedIndex - 1 + emuWidgets.size()) % emuWidgets.size();
     }
-    // Mouvement vers la gauche
-    else if (value < -THRESHOLD && lastAxisValue >= -THRESHOLD) {
-        selectedIndex = (selectedIndex - 1 + emuWidgets.size()) % emuWidgets.size();
-        updateVisibleWidgets();
-    }
-
     lastAxisValue = value;
+  } else {
+    lastAxisValue = 0;
+    return;
+  }
+
+  updateVisibleWidgets();
+  updateSelection();
 }
 
 void Carousel::updateVisibleWidgets() {
-  QHBoxLayout *layout = qobject_cast<QHBoxLayout *>(this->layout());
+  QLayout *layout = this->layout();
   if (!layout)
     return;
 
-  // Masquer tous les widgets avant de réafficher les visibles
+  // Masquer tous les widgets et les retirer du layout
   for (EmulatorWidget *widget : emuWidgets) {
+    layout->removeWidget(widget);
     widget->hide();
-    // Optionnel : Retirer du layout pour optimiser, mais hide() suffit souvent
-    // layout->removeWidget(widget);
   }
 
   int halfVisible = VISIBLE_WIDGETS_COUNT / 2;
@@ -106,30 +118,42 @@ void Carousel::updateVisibleWidgets() {
     start = 0;
     end = qMin(static_cast<int>(emuWidgets.size() - 1),
                VISIBLE_WIDGETS_COUNT - 1);
-  } else if (end >= emuWidgets.size()) {
-    end = emuWidgets.size() - 1;
+  } else if (end >= static_cast<int>(emuWidgets.size())) {
+    end = static_cast<int>(emuWidgets.size() - 1);
     start =
         qMax(0, static_cast<int>(emuWidgets.size() - VISIBLE_WIDGETS_COUNT));
   }
 
   // Ajouter les widgets visibles au layout et les afficher
   for (int i = start; i <= end; ++i) {
-    layout->addWidget(emuWidgets[i], 0, Qt::AlignCenter);
+    layout->addWidget(emuWidgets[i]);
     emuWidgets[i]->show();
   }
+
   updateSelection();
 }
 
 void Carousel::updateSelection() {
-  for (size_t i = 0; i < emuWidgets.size(); ++i) {
+  for (int i = 0; i < static_cast<int>(emuWidgets.size()); ++i) {
     EmulatorWidget *widget = emuWidgets[i];
     if (i == selectedIndex) {
-      // Style de l'émulateur sélectionné
-      widget->setStyleSheet("border: 4px solid #4C9EFF; border-radius: 15px;");
-    } else {
-      // Style par défaut pour les autres émulateurs
+      // L'élément sélectionné est mis en avant
+      widget->setGraphicsEffect(nullptr); // Réinitialiser l'effet
+      widget->setFixedSize(QSize(250, 300));
       widget->setStyleSheet(
-          "border: 4px solid transparent; border-radius: 15px;");
+          "background-color: #4A4A4A; border: 2px solid #007AFF;");
+    } else {
+      // Les autres éléments sont plus petits
+      widget->setFixedSize(QSize(200, 250));
+      widget->setStyleSheet("background-color: #3C3C3C; border: none;");
+
+      // Effet d'ombre pour les widgets non sélectionnés
+      QGraphicsDropShadowEffect *shadowEffect =
+          new QGraphicsDropShadowEffect(widget);
+      shadowEffect->setBlurRadius(10);
+      shadowEffect->setColor(QColor(0, 0, 0, 150));
+      shadowEffect->setOffset(5, 5);
+      widget->setGraphicsEffect(shadowEffect);
     }
   }
 }
