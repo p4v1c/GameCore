@@ -19,11 +19,14 @@ signals:
   void controllerConnected(const QString &name);
   void controllerDisconnected();
   void buttonPressed(int button);
-  void axisMoved(int axis, int value); // Add the new signal for axis movement
+  void axisMoved(int axis, int value);
+  void buttonAPressed();
+  void buttonBPressed();
+  void buttonXPressed();
+  void buttonYPressed();
 
 private:
   SDL_GameController *gameController;
 };
 
 #endif // CONTROLLERMANAGER_H
-

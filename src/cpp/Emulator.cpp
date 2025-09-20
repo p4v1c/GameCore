@@ -76,7 +76,7 @@ void EmulatorManager::scanEmulators(const QString &directory) {
         emu.icon = QPixmap(128, 128);
         emu.icon.fill(Qt::gray);
       }
-    } else if (lower.contains("citra")) {
+    } else if (lower.contains("azahar")) {
       emu.platform = "3DS";
       if (!emu.icon.load("../assets/logos/3ds.png")) {
         qDebug() << "Impossible de charger 3ds.png";

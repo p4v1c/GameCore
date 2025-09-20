@@ -1,0 +1,62 @@
+{
+  "azahar": {
+    "name": "Azahar",
+    "path": "flatpak",
+    "args": "run org.azahar_emu.Azahar -f"
+  },
+  "bsnes": {
+    "name": "BSNES",
+    "path": "/usr/bin/bsnes",
+    "args": "--fullscreen"
+  },
+  "dolphin": {
+    "name": "Dolphin",
+    "path": "/usr/bin/dolphin-emu",
+    "args": "-e"
+  },
+  "duckstation": {
+    "name": "DuckStation",
+    "path": "/usr/bin/duckstation",
+    "args": "-fullscreen"
+  },
+  "fceux": {
+    "name": "FCEUX",
+    "path": "/usr/bin/fceux",
+    "args": "-f"
+  },
+  "melonds": {
+    "name": "melonDS",
+    "path": "/usr/bin/melonds",
+    "args": "--fullscreen"
+  },
+  "mgba": {
+    "name": "mGBA",
+    "path": "/usr/bin/mgba",
+    "args": "-f"
+  },
+  "mupen64plus": {
+    "name": "Mupen64Plus",
+    "path": "/usr/bin/mupen64plus",
+    "args": ""
+  },
+  "pcsx2": {
+    "name": "PCSX2",
+    "path": "/usr/bin/pcsx2",
+    "args": "--fullscreen"
+  },
+  "ppsspp": {
+    "name": "PPSSPP",
+    "path": "/usr/bin/ppsspp",
+    "args": "--fullscreen"
+  },
+  "rpcs3": {
+    "name": "RPCS3",
+    "path": "/usr/bin/rpcs3",
+    "args": "-f"
+  },
+  "yuzu": {
+    "name": "Yuzu",
+    "path": "/usr/bin/yuzu",
+    "args": "-f"
+  }
+}
