@@ -7,6 +7,10 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <SDL.h>
+#include <QProcess>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QFile>
 
 GameListWidget::GameListWidget(QWidget *parent)
     : QWidget(parent), lastAxisValue(0) {
@@ -22,7 +26,7 @@ GameListWidget::GameListWidget(QWidget *parent)
       "    color: #E0E0E0;"
       "    font-size: 24px;"
       "    border: 2px solid #555555;"
-      "    border-radius: 15px;" // Coins arrondis
+      "    border-radius: 15px;"
       "}"
       "QListWidget::item {"
       "    background: transparent;"
@@ -31,11 +35,11 @@ GameListWidget::GameListWidget(QWidget *parent)
       "QListWidget::item:selected {"
       "    background-color: #007AFF;"
       "    color: white;"
-      "    border-radius: 10px;" // Coins arrondis pour la sélection
+      "    border-radius: 10px;"
       "}");
   gameList->setFocusPolicy(Qt::NoFocus);
-  gameList->setFixedWidth(800);    // Rendre le rectangle plus large
-  gameList->setMinimumHeight(400); // Définir une hauteur minimale
+  gameList->setFixedWidth(800);
+  gameList->setMinimumHeight(400);
 
   layout->addWidget(gameList, 0, Qt::AlignCenter);
   setLayout(layout);
@@ -114,6 +118,8 @@ void GameListWidget::scanRoms(const QString &path,
 void GameListWidget::keyPressEvent(QKeyEvent *event) {
   if (event->key() == Qt::Key_Escape) {
     emit goBackToCarousel();
+  } else if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) {
+    launchSelectedGame();
   }
 }
 
@@ -123,6 +129,8 @@ void GameListWidget::handleControllerButton(int button) {
 
   if (button == SDL_CONTROLLER_BUTTON_B) {
     emit goBackToCarousel();
+  } else if (button == SDL_CONTROLLER_BUTTON_A) {
+    launchSelectedGame();
   } else if (button == SDL_CONTROLLER_BUTTON_DPAD_DOWN) {
     gameList->setCurrentRow((gameList->currentRow() + 1) % gameList->count());
   } else if (button == SDL_CONTROLLER_BUTTON_DPAD_UP) {
@@ -146,4 +154,35 @@ void GameListWidget::handleControllerAxis(int axis, int value) {
   }
 
   lastAxisValue = value;
+}
+
+void GameListWidget::launchSelectedGame() {
+    if (gameList->currentRow() < 0) return;
+    QString selectedGameName = gameList->currentItem()->text();
+
+    QFile file("../config/settings.json");
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning() << "Impossible d'ouvrir le fichier de configuration JSON: ../config/settings.json";
+        return;
+    }
+
+    QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
+    QJsonObject emulatorsConfig = doc.object();
+    file.close();
+
+    if (!emulatorsConfig.contains(selectedEmulatorName)) {
+        qWarning() << "Configuration non trouvée pour l'émulateur:" << selectedEmulatorName;
+        return;
+    }
+
+    QJsonObject emuConfig = emulatorsConfig.value(selectedEmulatorName).toObject();
+    QString emuPath = emuConfig.value("path").toString();
+    QString emuArgs = emuConfig.value("args").toString();
+
+    QMap<QString, EmulatorConfig::Config> configs = EmulatorConfig::getEmulatorConfigs();
+    QString romsPath = configs.value(selectedEmulatorName).romsPath;
+    QString fullGamePath = QDir(romsPath).filePath(selectedGameName);
+
+    // FIX : On passe les trois arguments au signal
+    emit launchGame(emuPath, emuArgs, fullGamePath);
 }

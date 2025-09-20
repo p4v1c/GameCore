@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_GameListWidget_t {
-    QByteArrayData data[8];
-    char stringdata0[95];
+    QByteArrayData data[13];
+    char stringdata0[160];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -35,16 +35,23 @@ static const qt_meta_stringdata_GameListWidget_t qt_meta_stringdata_GameListWidg
 QT_MOC_LITERAL(0, 0, 14), // "GameListWidget"
 QT_MOC_LITERAL(1, 15, 16), // "goBackToCarousel"
 QT_MOC_LITERAL(2, 32, 0), // ""
-QT_MOC_LITERAL(3, 33, 22), // "handleControllerButton"
-QT_MOC_LITERAL(4, 56, 6), // "button"
-QT_MOC_LITERAL(5, 63, 20), // "handleControllerAxis"
-QT_MOC_LITERAL(6, 84, 4), // "axis"
-QT_MOC_LITERAL(7, 89, 5) // "value"
+QT_MOC_LITERAL(3, 33, 10), // "launchGame"
+QT_MOC_LITERAL(4, 44, 12), // "emulatorPath"
+QT_MOC_LITERAL(5, 57, 12), // "emulatorArgs"
+QT_MOC_LITERAL(6, 70, 8), // "gamePath"
+QT_MOC_LITERAL(7, 79, 22), // "handleControllerButton"
+QT_MOC_LITERAL(8, 102, 6), // "button"
+QT_MOC_LITERAL(9, 109, 20), // "handleControllerAxis"
+QT_MOC_LITERAL(10, 130, 4), // "axis"
+QT_MOC_LITERAL(11, 135, 5), // "value"
+QT_MOC_LITERAL(12, 141, 18) // "launchSelectedGame"
 
     },
     "GameListWidget\0goBackToCarousel\0\0"
-    "handleControllerButton\0button\0"
-    "handleControllerAxis\0axis\0value"
+    "launchGame\0emulatorPath\0emulatorArgs\0"
+    "gamePath\0handleControllerButton\0button\0"
+    "handleControllerAxis\0axis\0value\0"
+    "launchSelectedGame"
 };
 #undef QT_MOC_LITERAL
 
@@ -54,26 +61,30 @@ static const uint qt_meta_data_GameListWidget[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-       3,   14, // methods
+       5,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       1,       // signalCount
+       2,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    0,   29,    2, 0x06 /* Public */,
+       1,    0,   39,    2, 0x06 /* Public */,
+       3,    3,   40,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       3,    1,   30,    2, 0x0a /* Public */,
-       5,    2,   33,    2, 0x0a /* Public */,
+       7,    1,   47,    2, 0x0a /* Public */,
+       9,    2,   50,    2, 0x0a /* Public */,
+      12,    0,   55,    2, 0x08 /* Private */,
 
  // signals: parameters
     QMetaType::Void,
+    QMetaType::Void, QMetaType::QString, QMetaType::QString, QMetaType::QString,    4,    5,    6,
 
  // slots: parameters
-    QMetaType::Void, QMetaType::Int,    4,
-    QMetaType::Void, QMetaType::Int, QMetaType::Int,    6,    7,
+    QMetaType::Void, QMetaType::Int,    8,
+    QMetaType::Void, QMetaType::Int, QMetaType::Int,   10,   11,
+    QMetaType::Void,
 
        0        // eod
 };
@@ -85,8 +96,10 @@ void GameListWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _
         (void)_t;
         switch (_id) {
         case 0: _t->goBackToCarousel(); break;
-        case 1: _t->handleControllerButton((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 2: _t->handleControllerAxis((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 1: _t->launchGame((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])),(*reinterpret_cast< const QString(*)>(_a[3]))); break;
+        case 2: _t->handleControllerButton((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 3: _t->handleControllerAxis((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 4: _t->launchSelectedGame(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -95,6 +108,13 @@ void GameListWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _
             using _t = void (GameListWidget::*)();
             if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&GameListWidget::goBackToCarousel)) {
                 *result = 0;
+                return;
+            }
+        }
+        {
+            using _t = void (GameListWidget::*)(const QString & , const QString & , const QString & );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&GameListWidget::launchGame)) {
+                *result = 1;
                 return;
             }
         }
@@ -130,13 +150,13 @@ int GameListWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 3)
+        if (_id < 5)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 3;
+        _id -= 5;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 3)
+        if (_id < 5)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 3;
+        _id -= 5;
     }
     return _id;
 }
@@ -145,6 +165,13 @@ int GameListWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 void GameListWidget::goBackToCarousel()
 {
     QMetaObject::activate(this, &staticMetaObject, 0, nullptr);
+}
+
+// SIGNAL 1
+void GameListWidget::launchGame(const QString & _t1, const QString & _t2, const QString & _t3)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t2))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t3))) };
+    QMetaObject::activate(this, &staticMetaObject, 1, _a);
 }
 QT_WARNING_POP
 QT_END_MOC_NAMESPACE
