@@ -27,6 +27,9 @@ private:
   void updateVisibleWidgets();
   void updateSelection();
 
+  bool axisMovedRight;
+  bool axisMovedLeft;
+
   std::vector<EmulatorWidget *> emuWidgets;
   int selectedIndex;
   int lastAxisValue;
