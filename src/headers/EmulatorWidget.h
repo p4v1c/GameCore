@@ -6,19 +6,19 @@
 #include <QWidget>
 
 class EmulatorWidget : public QWidget {
-  Q_OBJECT
+    Q_OBJECT
 
 public:
-  // Constructeur qui prend un objet Emulator et un parent (le widget conteneur)
-  explicit EmulatorWidget(const Emulator &emu, QWidget *parent = nullptr);
+    explicit EmulatorWidget(const Emulator &emu, QWidget *parent = nullptr);
 
-  // Getters pour accéder aux labels de l'extérieur
-  QLabel *getNameLabel() const;
-  QLabel *getIconLabel() const;
+    QLabel *getNameLabel() const;
+    QLabel *getIconLabel() const;
+    QString getEmulatorName() const; // Ajout de cette méthode
 
 private:
-  QLabel *nameLabel;
-  QLabel *iconLabel;
+    QLabel *nameLabel;
+    QLabel *iconLabel;
+    QString m_emulatorName; // Ajout de cette variable membre
 };
 
 #endif // EMULATORWIDGET_H

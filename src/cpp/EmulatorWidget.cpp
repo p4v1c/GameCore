@@ -5,28 +5,25 @@
 #include <QVBoxLayout>
 
 EmulatorWidget::EmulatorWidget(const Emulator &emu, QWidget *parent)
-    : QWidget(parent) {
-
-  // Le layout pour organiser les labels verticalement
+    : QWidget(parent), m_emulatorName(emu.name) {
   QVBoxLayout *layout = new QVBoxLayout(this);
   layout->setContentsMargins(0, 0, 0, 0);
-  layout->setSpacing(10);
+  layout->setSpacing(50);
 
-  // Le label pour le nom de la console (ex: "Switch")
+  // Définit une taille fixe pour l'ensemble du widget de l'émulateur
+  setFixedSize(QSize(200, 250));
+
   nameLabel = new QLabel(emu.platform);
   nameLabel->setAlignment(Qt::AlignCenter);
-  nameLabel->setStyleSheet(
-      "color: qlineargradient(spread:pad, x1:0, y1:0, "
-      "x2:1, y2:0, stop:0 #BBBBBB, stop:1 #DDDDDD);"
-      "font-weight: bold;"
-      "font-size: 28px;"
-      "font-family: 'Arial';"
-      "border: 0pchatx solid transparent;"); // Ajout de cette ligne pour
-                                             // enlever la bordure
+  nameLabel->setStyleSheet("color: qlineargradient(spread:pad, x1:0, y1:0, "
+                           "x2:1, y2:0, stop:0 #BBBBBB, stop:1 #DDDDDD);"
+                           "font-weight: bold;"
+                           "font-size: 28px;"
+                           "border-radius: 15px;"
+                           "font-family: 'Arial';");
 
   layout->addWidget(nameLabel, 0, Qt::AlignHCenter);
 
-  // Le label pour l'icône de l'émulateur
   iconLabel = new QLabel();
   if (!emu.icon.isNull()) {
     iconLabel->setPixmap(emu.icon.scaled(150, 150, Qt::KeepAspectRatio,
@@ -37,11 +34,10 @@ EmulatorWidget::EmulatorWidget(const Emulator &emu, QWidget *parent)
     iconLabel->setPixmap(placeholder);
   }
   iconLabel->setAlignment(Qt::AlignCenter);
-  iconLabel->setStyleSheet("border-radius:15px; background-color:#444444;");
-  layout->addWidget(iconLabel, 0, Qt::AlignCenter);
+  iconLabel->setStyleSheet("background-color:#444444; border-radius: 50px;");
+  layout->addWidget(iconLabel, 0, Qt::AlignHCenter);
 }
 
-// Getters
 QLabel *EmulatorWidget::getNameLabel() const { return nameLabel; }
-
 QLabel *EmulatorWidget::getIconLabel() const { return iconLabel; }
+QString EmulatorWidget::getEmulatorName() const { return m_emulatorName; }

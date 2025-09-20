@@ -1,17 +1,21 @@
 #include "../headers/Carousel.h"
+#include "../headers/Emulator.h"
+#include <QDebug>
 #include <QGraphicsDropShadowEffect>
 #include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QPropertyAnimation>
 #include <QtMath>
+#include <SDL.h>
 
-// Définition du nombre d'émulateurs visibles à l'écran
 const int VISIBLE_WIDGETS_COUNT = 5;
 
-Carousel::Carousel(QWidget *parent) : QWidget(parent), selectedIndex(0) {
+Carousel::Carousel(QWidget *parent)
+    : QWidget(parent), selectedIndex(0), axisMovedRight(false),
+      axisMovedLeft(false) {
   setStyleSheet("background-color: #2E2E2E;");
   QHBoxLayout *layout = new QHBoxLayout(this);
-  layout->setSpacing(50);
+  layout->setSpacing(10);
   layout->setContentsMargins(50, 0, 50, 0);
 
   setFocusPolicy(Qt::StrongFocus);
@@ -22,14 +26,14 @@ void Carousel::scanEmulators(const QString &path) {
   EmulatorManager emuManager;
   emuManager.scanEmulators(path);
 
-  // Vider la liste existante des widgets
   qDeleteAll(emuWidgets);
   emuWidgets.clear();
 
-  // Créer tous les widgets et les stocker en mémoire
+  QHBoxLayout *layout = qobject_cast<QHBoxLayout *>(this->layout());
   for (const Emulator &emu : emuManager.getEmulators()) {
     EmulatorWidget *w = new EmulatorWidget(emu, this);
     emuWidgets.push_back(w);
+    layout->addWidget(w);
   }
 
   updateVisibleWidgets();
@@ -44,92 +48,112 @@ void Carousel::keyPressEvent(QKeyEvent *event) {
     selectedIndex = (selectedIndex + 1) % emuWidgets.size();
   } else if (event->key() == Qt::Key_Left) {
     selectedIndex = (selectedIndex - 1 + emuWidgets.size()) % emuWidgets.size();
+  } else if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
+    if (selectedIndex >= 0 &&
+        static_cast<size_t>(selectedIndex) < emuWidgets.size()) {
+      emit switchToGameList(emuWidgets[selectedIndex]->getEmulatorName());
+    }
   } else {
-    return; // Ne pas mettre à jour si la touche n'est pas une flèche
+    QWidget::keyPressEvent(event);
+    return;
   }
-
   updateVisibleWidgets();
+  updateSelection();
 }
 
-
 void Carousel::handleControllerButton(int button) {
-    if (emuWidgets.empty())
-        return;
+  if (emuWidgets.empty())
+    return;
 
-    if (button == SDL_CONTROLLER_BUTTON_DPAD_RIGHT) {
-        selectedIndex = (selectedIndex + 1) % emuWidgets.size();
-        updateVisibleWidgets();
-    } else if (button == SDL_CONTROLLER_BUTTON_DPAD_LEFT) {
-        selectedIndex = (selectedIndex - 1 + emuWidgets.size()) % emuWidgets.size();
-        updateVisibleWidgets();
+  if (button == SDL_CONTROLLER_BUTTON_DPAD_RIGHT) {
+    selectedIndex = (selectedIndex + 1) % emuWidgets.size();
+  } else if (button == SDL_CONTROLLER_BUTTON_DPAD_LEFT) {
+    selectedIndex = (selectedIndex - 1 + emuWidgets.size()) % emuWidgets.size();
+  } else if (button == SDL_CONTROLLER_BUTTON_A) { // Bouton X PS4
+    if (selectedIndex >= 0 &&
+        static_cast<size_t>(selectedIndex) < emuWidgets.size()) {
+      emit switchToGameList(emuWidgets[selectedIndex]->getEmulatorName());
     }
+  }
+  updateVisibleWidgets();
+  updateSelection();
 }
 
 void Carousel::handleControllerAxis(int axis, int value) {
-    if (emuWidgets.empty() || axis != SDL_CONTROLLER_AXIS_LEFTX)
-        return;
+  if (emuWidgets.empty())
+    return;
 
-    const int THRESHOLD = 16000;
+  const int THRESHOLD = 16000;
+  const int NEUTRAL_ZONE = 8000;
 
-    // Mouvement vers la droite
-    if (value > THRESHOLD && lastAxisValue <= THRESHOLD) {
-        selectedIndex = (selectedIndex + 1) % emuWidgets.size();
-        updateVisibleWidgets();
+  // On ne gère que l'axe horizontal
+  if (axis != SDL_CONTROLLER_AXIS_LEFTX && axis != SDL_CONTROLLER_AXIS_RIGHTX)
+    return;
+
+  // Stick vers la droite
+  if (value > THRESHOLD) {
+    if (!axisMovedRight) {
+      selectedIndex = (selectedIndex + 1) % emuWidgets.size();
+      updateVisibleWidgets();
+      updateSelection();
+      axisMovedRight = true;
+      axisMovedLeft = false;
     }
-    // Mouvement vers la gauche
-    else if (value < -THRESHOLD && lastAxisValue >= -THRESHOLD) {
-        selectedIndex = (selectedIndex - 1 + emuWidgets.size()) % emuWidgets.size();
-        updateVisibleWidgets();
+  }
+  // Stick vers la gauche
+  else if (value < -THRESHOLD) {
+    if (!axisMovedLeft) {
+      selectedIndex =
+          (selectedIndex - 1 + emuWidgets.size()) % emuWidgets.size();
+      updateVisibleWidgets();
+      updateSelection();
+      axisMovedLeft = true;
+      axisMovedRight = false;
     }
-
-    lastAxisValue = value;
+  }
+  // Stick revenu au centre
+  else if (qAbs(value) < NEUTRAL_ZONE) {
+    axisMovedLeft = false;
+    axisMovedRight = false;
+  }
 }
 
 void Carousel::updateVisibleWidgets() {
-  QHBoxLayout *layout = qobject_cast<QHBoxLayout *>(this->layout());
-  if (!layout)
-    return;
-
-  // Masquer tous les widgets avant de réafficher les visibles
-  for (EmulatorWidget *widget : emuWidgets) {
-    widget->hide();
-    // Optionnel : Retirer du layout pour optimiser, mais hide() suffit souvent
-    // layout->removeWidget(widget);
-  }
-
   int halfVisible = VISIBLE_WIDGETS_COUNT / 2;
   int start = selectedIndex - halfVisible;
   int end = selectedIndex + halfVisible;
 
-  // Gestion des cas extrêmes au début et à la fin de la liste
-  if (start < 0) {
+  if (selectedIndex < halfVisible) {
     start = 0;
-    end = qMin(static_cast<int>(emuWidgets.size() - 1),
-               VISIBLE_WIDGETS_COUNT - 1);
-  } else if (end >= emuWidgets.size()) {
+    end = VISIBLE_WIDGETS_COUNT - 1;
+  } else if (selectedIndex >=
+             static_cast<int>(emuWidgets.size() - halfVisible)) {
+    start = emuWidgets.size() - VISIBLE_WIDGETS_COUNT;
     end = emuWidgets.size() - 1;
-    start =
-        qMax(0, static_cast<int>(emuWidgets.size() - VISIBLE_WIDGETS_COUNT));
   }
 
-  // Ajouter les widgets visibles au layout et les afficher
-  for (int i = start; i <= end; ++i) {
-    layout->addWidget(emuWidgets[i], 0, Qt::AlignCenter);
-    emuWidgets[i]->show();
+  for (EmulatorWidget *widget : emuWidgets) {
+    widget->hide();
   }
-  updateSelection();
+
+  for (int i = start; i <= end; ++i) {
+    if (i >= 0 && i < emuWidgets.size()) {
+      emuWidgets[i]->show();
+    }
+  }
 }
 
 void Carousel::updateSelection() {
   for (size_t i = 0; i < emuWidgets.size(); ++i) {
     EmulatorWidget *widget = emuWidgets[i];
-    if (i == selectedIndex) {
-      // Style de l'émulateur sélectionné
-      widget->setStyleSheet("border: 4px solid #4C9EFF; border-radius: 15px;");
+    if (static_cast<int>(i) == selectedIndex) {
+      widget->getIconLabel()->setStyleSheet(
+          "border: 4px solid #4C9EFF; background-color:#444444; border-radius: "
+          "15px;");
     } else {
-      // Style par défaut pour les autres émulateurs
-      widget->setStyleSheet(
-          "border: 4px solid transparent; border-radius: 15px;");
+      widget->getIconLabel()->setStyleSheet(
+          "border: 4px solid transparent; background-color:#444444; "
+          "border-radius: 15px;");
     }
   }
 }
