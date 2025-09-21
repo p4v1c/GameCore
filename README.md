@@ -13,7 +13,7 @@ sudo chown -R p4v1c:p4v1c /opt/GameCore/
 - Install QT :
 ```sh
 sudo apt update
-sudo apt install qtbase5-dev qtbase5-dev-tools qtchooser qt5-qmake qttools5-dev qttools5-dev-tools
+sudo apt install qtbase5-dev qtbase5-dev-tools qtchooser qt5-qmake qttools5-dev qttools5-dev-tools build-essential
 ```
 
 - Install SDL :
