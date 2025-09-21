@@ -40,11 +40,11 @@ QMap<QString, EmulatorConfig::Config> EmulatorConfig::getEmulatorConfigs() {
   configs.insert("melonds", melondsConfig);
 
   // Configuration pour la 3DS (azahar)
-  Config azaharConfig;
-  azaharConfig.emulatorName = "azahar";
-  azaharConfig.romsPath = ROMS_DIR + "azahar/roms/";
-  azaharConfig.extensions << "*.3ds" << "*.3dsx" << "*.cci" << "*.zip";
-  configs.insert("azahar", azaharConfig);
+  Config citraConfig;
+  citraConfig.emulatorName = "citra";
+  citraConfig.romsPath = ROMS_DIR + "citra/roms/";
+  citraConfig.extensions << "*.3ds" << "*.3dsx" << "*.cci" << "*.zip";
+  configs.insert("citra", citraConfig);
 
   // Configuration pour la GBA (mGBA)
   Config mgbaConfig;
@@ -54,19 +54,19 @@ QMap<QString, EmulatorConfig::Config> EmulatorConfig::getEmulatorConfigs() {
   configs.insert("mgba", mgbaConfig);
 
   // Configuration pour la PS1 (DuckStation)
-  Config duckstationConfig;
-  duckstationConfig.emulatorName = "duckstation";
-  duckstationConfig.romsPath = ROMS_DIR + "duckstation/roms/";
-  duckstationConfig.extensions << "*.bin" << "*.cue" << "*.iso" << "*.img"
+  Config swanstationConfig;
+  swanstationConfig.emulatorName = "swanstation";
+  swanstationConfig.romsPath = ROMS_DIR + "swan/roms/";
+  swanstationConfig.extensions << "*.bin" << "*.cue" << "*.iso" << "*.img"
                                << "*.zip";
-  configs.insert("duckstation", duckstationConfig);
+  configs.insert("swanstation", swanstationConfig);
 
   // Configuration pour la PS2 (PCSX2)
-  Config pcsx2Config;
-  pcsx2Config.emulatorName = "pcsx2";
-  pcsx2Config.romsPath = ROMS_DIR + "pcsx2/roms/";
-  pcsx2Config.extensions << "*.iso" << "*.bin" << "*.zip";
-  configs.insert("pcsx2", pcsx2Config);
+  Config LRPS2Config;
+  LRPS2Config.emulatorName = "LRPS2";
+  LRPS2Config.romsPath = ROMS_DIR + "LRPS2/roms/";
+  LRPS2Config.extensions << "*.iso" << "*.bin" << "*.zip";
+  configs.insert("LRPS2", LRPS2Config);
 
   // Configuration pour la PS3 (RPCS3)
   Config rpcs3Config;
@@ -83,11 +83,11 @@ QMap<QString, EmulatorConfig::Config> EmulatorConfig::getEmulatorConfigs() {
   configs.insert("ppsspp", ppssppConfig);
 
   // Configuration pour la Switch (Yuzu)
-  Config yuzuConfig;
-  yuzuConfig.emulatorName = "yuzu";
-  yuzuConfig.romsPath = ROMS_DIR + "yuzu/roms/";
-  yuzuConfig.extensions << "*.nsp" << "*.xci" << "*.zip";
-  configs.insert("yuzu", yuzuConfig);
+  Config RyujinxConfig;
+  RyujinxConfig.emulatorName = "Ryujinx";
+  RyujinxConfig.romsPath = ROMS_DIR + "Ryujinx/roms/";
+  RyujinxConfig.extensions << "*.nsp" << "*.xci" << "*.zip";
+  configs.insert("Ryujinx", RyujinxConfig);
 
   return configs;
 }
