@@ -50,7 +50,7 @@ https://rpcs3.net/download
 
 - GameCore as service :
 
-**Create .servie fille**
+**Create .service file**
 ```sh
 sudo nano /etc/systemd/system/GameCore.service
 ```
