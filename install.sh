@@ -53,7 +53,8 @@ echo "=== Installation Qt, SDL2, Make, Flatpak, SSH ==="
 sudo apt update
 sudo apt install -y \
   qtbase5-dev qtbase5-dev-tools qtchooser qt5-qmake qttools5-dev qttools5-dev-tools \
-  libsdl2-dev make flatpak openssh-server samba
+  libsdl2-dev make flatpak openssh-server samba build-essential
+
 
 # --- RetroArch via Flatpak ---
 echo "=== Installation RetroArch ==="
