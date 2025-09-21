@@ -1,0 +1,62 @@
+{
+    "citra": {
+        "name": "Citra",
+        "path": "flatpak",
+        "args": "run org.libretro.RetroArch  -L ../lib/citra2018_libretro.so --fullscreen"
+    },
+    "bsnes": {
+        "name": "BSNES",
+        "path": "flatpak",
+        "args": "run org.libretro.RetroArch  -L ../lib/bsnes_libretro.so --fullscreen"
+    },
+    "dolphin": {
+        "name": "Dolphin",
+        "path": "flatpak",
+        "args": "run org.libretro.RetroArch  -L ../lib/dolphin_libretro.so --fullscreen"
+    },
+    "swanstation": {
+        "name": "SwanStation",
+        "path": "flatpak",
+        "args": "run org.libretro.RetroArch  -L ../lib/swanstation_libretro.so --fullscreen"
+    },
+    "fceux": {
+        "name": "FCEUX",
+        "path": "flatpak",
+        "args": "run org.libretro.RetroArch  -L ../lib/fceumm_libretro.so --fullscreen"
+    },
+    "melonds": {
+        "name": "melonDS",
+        "path": "flatpak",
+        "args": "run org.libretro.RetroArch  -L ../lib/melonds_libretro.so --fullscreen"
+    },
+    "mgba": {
+        "name": "mGBA",
+        "path": "flatpak",
+        "args": "run org.libretro.RetroArch  -L ../lib/mgba_libretro.so --fullscreen"
+    },
+    "mupen64plus": {
+        "name": "Mupen64Plus",
+        "path": "flatpak",
+        "args": "run org.libretro.RetroArch  -L ../lib/mupen64plus_next_libretro.so --fullscreen"
+    },
+    "LRPS2": {
+        "name": "LRPS2",
+        "path": "flatpak",
+        "args": "run org.libretro.RetroArch  -L ../lib/pcsx2_libretro.so --fullscreen"
+    },
+    "ppsspp": {
+        "name": "PPSSPP",
+        "path": "flatpak",
+        "args": "run org.libretro.RetroArch  -L ../lib/ppsspp_libretro.so --fullscreen"
+    },
+    "rpcs3": {
+        "name": "RPCS3",
+        "path": "../lib/rpcs3.AppImage",
+        "args": " --fullscreen"
+    },
+    "Ryujinx ": {
+        "name": "Ryujinx",
+        "path": "../lib/ryujinx.AppImage",
+        "args": "--fullscreen"
+    }
+}

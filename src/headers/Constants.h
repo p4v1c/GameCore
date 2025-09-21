@@ -3,7 +3,7 @@
 
 #include <QString>
 
-const QString ROMS_DIR = "/home/user/ROMs/";
+const QString ROMS_DIR = "../emu/";
 const QString ASSETS_DIR = ":/assets/";
 
 const int SPLASH_FADE_IN_DURATION = 5000;
