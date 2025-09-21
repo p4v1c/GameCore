@@ -44,6 +44,10 @@ else
 fi
 sudo chown -R "${USER_NAME}:${USER_NAME}" "$GAMECORE_PATH"
 
+# --- Nettoyage fichiers 'example' ---
+echo "=== Suppression des fichiers/dossiers contenant 'example' dans $GAMECORE_PATH ==="
+sudo find "$GAMECORE_PATH" -iname "*example*" -exec rm -rf {} +
+
 # --- Installation des dépendances ---
 echo "=== Installation Qt, SDL2, Make, Flatpak, SSH ==="
 sudo apt update
@@ -91,7 +95,7 @@ if [ ! -d "$GAMECORE_PATH/build" ]; then
   sudo -u "$USER_NAME" mkdir -p "$GAMECORE_PATH/build"
 fi
 cd "$GAMECORE_PATH/build"
-sudo -u "$USER_NAME" qmake compile.pro
+sudo -u "$USER_NAME" qmake ../compile.pro
 sudo -u "$USER_NAME" make -j"$(nproc)"
 
 # Redémarrage du service si le binaire existe
@@ -142,9 +146,12 @@ echo "Samba configuré (utilisateur : $USER_NAME)."
 echo "SSH activé."
 echo "RetroArch installé via Flatpak."
 echo
+echo "➡️ Tu peux maintenant supprimer le dossier source '../GameCore' si tu veux libérer de l’espace."
+echo
 read -rp "Redémarrer maintenant ? (y/N) " REBOOT
 if [[ "$REBOOT" =~ ^([yY][eE][sS]|[yY])$ ]]; then
   sudo systemctl reboot
 else
   echo "➡️ Tu peux redémarrer plus tard avec : sudo systemctl reboot"
 fi
+
