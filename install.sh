@@ -37,7 +37,7 @@ sudo chmod 777 "$GAMECORE_PARENT_DIR"
 
 if [ -d "../GameCore" ]; then
   echo "Copie de ../GameCore vers $GAMECORE_PATH ..."
-  sudo cp -r ../GameCore "$GAMECORE_PATH"
+  sudo cp -r ../GameCore/. "$GAMECORE_PATH"
 else
   echo "⚠️ ../GameCore n'existe pas. Création du dossier cible vide."
   sudo mkdir -p "$GAMECORE_PATH"
@@ -95,7 +95,7 @@ if [ ! -d "$GAMECORE_PATH/build" ]; then
   sudo -u "$USER_NAME" mkdir -p "$GAMECORE_PATH/build"
 fi
 cd "$GAMECORE_PATH/build"
-sudo -u "$USER_NAME" qmake compile.pro
+sudo -u "$USER_NAME" qmake ../compile.pro
 sudo -u "$USER_NAME" make -j"$(nproc)"
 
 # Redémarrage du service si le binaire existe
