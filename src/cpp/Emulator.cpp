@@ -20,7 +20,7 @@ void EmulatorManager::scanEmulators(const QString &directory) {
 
     QString lower = entry.toLower();
 
-    if (lower.contains("yuzu")) {
+    if (lower.contains("Ryujinx")) {
       emu.platform = "Switch";
       if (!emu.icon.load("../assets/logos/switch.png")) {
         qDebug() << "Impossible de charger switch.png";
@@ -41,7 +41,7 @@ void EmulatorManager::scanEmulators(const QString &directory) {
         emu.icon = QPixmap(128, 128);
         emu.icon.fill(Qt::gray);
       }
-    } else if (lower.contains("pcsx2")) {
+    } else if (lower.contains("LRPS2")) {
       emu.platform = "PS2";
       if (!emu.icon.load("../assets/logos/ps2.png")) {
         qDebug() << "Impossible de charger ps2.png";
@@ -55,7 +55,7 @@ void EmulatorManager::scanEmulators(const QString &directory) {
         emu.icon = QPixmap(128, 128);
         emu.icon.fill(Qt::gray);
       }
-    } else if (lower.contains("duckstation")) {
+    } else if (lower.contains("swanstation")) {
       emu.platform = "PS1";
       if (!emu.icon.load("../assets/logos/ps1.png")) {
         qDebug() << "Impossible de charger ps1.png";
@@ -76,7 +76,7 @@ void EmulatorManager::scanEmulators(const QString &directory) {
         emu.icon = QPixmap(128, 128);
         emu.icon.fill(Qt::gray);
       }
-    } else if (lower.contains("azahar")) {
+    } else if (lower.contains("citra")) {
       emu.platform = "3DS";
       if (!emu.icon.load("../assets/logos/3ds.png")) {
         qDebug() << "Impossible de charger 3ds.png";
