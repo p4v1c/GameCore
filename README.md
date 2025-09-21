@@ -63,7 +63,9 @@ After=network.target
 
 [Service]
 ExecStart=/opt/GameCore/build/GameCore
+WorkingDirectory=/opt/GameCore
 User=p4v1c
+Environment=DISPLAY=:0
 Restart=always
 
 [Install]
