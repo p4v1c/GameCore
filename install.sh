@@ -30,13 +30,13 @@ if ! id "$USER_NAME" >/dev/null 2>&1; then
   fi
 fi
 
-# --- Préparation répertoire /opt et copie GameCore ---
+# --- Préparation répertoire et copie GameCore ---
 echo "=== Préparation du répertoire $GAMECORE_PARENT_DIR ==="
 sudo mkdir -p "$GAMECORE_PARENT_DIR"
 sudo chmod 777 "$GAMECORE_PARENT_DIR"
 
 if [ -d "../GameCore" ]; then
-  echo "Copie de ../GameCore vers $GAMECORE_PATH ..."
+  echo "Copie du contenu de ../GameCore vers $GAMECORE_PATH ..."
   sudo cp -r ../GameCore/. "$GAMECORE_PATH"
 else
   echo "⚠️ ../GameCore n'existe pas. Création du dossier cible vide."
@@ -49,12 +49,11 @@ echo "=== Suppression des fichiers/dossiers contenant 'example' dans $GAMECORE_P
 sudo find "$GAMECORE_PATH" -iname "*example*" -exec rm -rf {} +
 
 # --- Installation des dépendances ---
-echo "=== Installation Qt, SDL2, Make, Flatpak, SSH ==="
+echo "=== Installation Qt, SDL2, Make, Flatpak, SSH, build-essential ==="
 sudo apt update
 sudo apt install -y \
   qtbase5-dev qtbase5-dev-tools qtchooser qt5-qmake qttools5-dev qttools5-dev-tools \
   libsdl2-dev make flatpak openssh-server samba build-essential
-
 
 # --- RetroArch via Flatpak ---
 echo "=== Installation RetroArch ==="
@@ -70,25 +69,33 @@ echo "Télécharge manuellement :"
 echo "  - Ryujinx : https://git.ryujinx.app/ryubing/ryujinx/-/releases"
 echo "  - RPCS3   : https://rpcs3.net/download"
 
-# --- Service systemd GameCore ---
-echo "=== Création du service systemd GameCore ==="
-SERVICE_PATH="/etc/systemd/system/GameCore.service"
-sudo bash -c "cat > $SERVICE_PATH <<EOF
+# --- Service utilisateur GameCore (GUI) ---
+echo "=== Création du service utilisateur GameCore ==="
+USER_SERVICE_DIR="/home/$USER_NAME/.config/systemd/user"
+sudo -u "$USER_NAME" mkdir -p "$USER_SERVICE_DIR"
+
+SERVICE_PATH="$USER_SERVICE_DIR/GameCore.service"
+sudo -u "$USER_NAME" bash -c "cat > $SERVICE_PATH <<EOF
 [Unit]
 Description=GameCore
-After=network.target
+After=graphical-session.target
 
 [Service]
 ExecStart=$GAMECORE_PATH/build/GameCore
-User=$USER_NAME
+WorkingDirectory=$GAMECORE_PATH
+Environment=DISPLAY=:0
+Environment=HOME=/home/$USER_NAME
+Environment=XDG_DATA_DIRS=/home/$USER_NAME/.local/share:/usr/local/share:/usr/share
 Restart=always
 
 [Install]
-WantedBy=graphical.target
+WantedBy=default.target
 EOF"
 
-sudo systemctl daemon-reload
-sudo systemctl enable GameCore.service
+# Activation du service utilisateur
+sudo -u "$USER_NAME" systemctl --user daemon-reload
+sudo -u "$USER_NAME" systemctl --user enable GameCore.service
+sudo -u "$USER_NAME" systemctl --user start GameCore.service
 
 # --- Compilation GameCore ---
 echo "=== Compilation de GameCore ==="
@@ -98,11 +105,6 @@ fi
 cd "$GAMECORE_PATH/build"
 sudo -u "$USER_NAME" qmake ../compile.pro
 sudo -u "$USER_NAME" make -j"$(nproc)"
-
-# Redémarrage du service si le binaire existe
-if [ -x "$GAMECORE_PATH/build/GameCore" ]; then
-  sudo systemctl restart GameCore.service
-fi
 
 # --- Samba configuration ---
 echo "=== Configuration Samba ==="
@@ -142,7 +144,7 @@ sudo systemctl start ssh
 # --- Fin ---
 echo
 echo "=== Installation terminée ==="
-echo "GameCore compilé et service activé."
+echo "GameCore compilé et service utilisateur activé."
 echo "Samba configuré (utilisateur : $USER_NAME)."
 echo "SSH activé."
 echo "RetroArch installé via Flatpak."
@@ -155,4 +157,3 @@ if [[ "$REBOOT" =~ ^([yY][eE][sS]|[yY])$ ]]; then
 else
   echo "➡️ Tu peux redémarrer plus tard avec : sudo systemctl reboot"
 fi
-
