@@ -95,7 +95,7 @@ if [ ! -d "$GAMECORE_PATH/build" ]; then
   sudo -u "$USER_NAME" mkdir -p "$GAMECORE_PATH/build"
 fi
 cd "$GAMECORE_PATH/build"
-sudo -u "$USER_NAME" qmake ../compile.pro
+sudo -u "$USER_NAME" qmake compile.pro
 sudo -u "$USER_NAME" make -j"$(nproc)"
 
 # Redémarrage du service si le binaire existe
