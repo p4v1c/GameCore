@@ -82,15 +82,6 @@ msg "Nettoyage extensions GNOME"
 gnome-extensions list | grep -q dash-to-dock@micxgx.gmail.com && \
   gnome-extensions disable dash-to-dock@micxgx.gmail.com || true
 
-# Installer hidetopbar via AUR (non-root)
-TMPDIR=$(mktemp -d)
-pushd "$TMPDIR"
-git clone https://aur.archlinux.org/gnome-shell-extension-hidetopbar-git.git
-cd gnome-shell-extension-hidetopbar-git
-sudo -u "$USER_NAME" makepkg -si --noconfirm
-popd
-rm -rf "$TMPDIR"
-
 # === RetroArch ===
 msg "Installation RetroArch via Flatpak"
 if ! flatpak remote-list | grep -q flathub; then
