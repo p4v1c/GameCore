@@ -123,7 +123,7 @@ if command -v qmake6 >/dev/null; then
 else
   QMAKE_BIN=qmake
 fi
-sudo -u "$USER_NAME" $QMAKE_BIN ../compile.pro
+sudo -u "$USER_NAME" $QMAKE_BIN compile.pro
 sudo -u "$USER_NAME" make -j"$(nproc)"
 
 # === Samba ===
