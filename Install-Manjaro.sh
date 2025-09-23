@@ -65,7 +65,13 @@ sudo systemctl enable --now thermald.service
 
 # --- Clean Gnome ---
 
-sudo apt remove gnome-shell-extension-ubuntu-dock
+gnome-extensions disable dash-to-dock@micxgx.gmail.com
+
+sudo pacman -S --needed git base-devel
+git clone https://aur.archlinux.org/gnome-shell-extension-hidetopbar-git.git
+cd gnome-shell-extension-hidetopbar-git
+makepkg -si
+
 
 # --- RetroArch via Flatpak ---
 echo "=== Installation RetroArch ==="
@@ -125,6 +131,7 @@ echo "Polybar installé et caché par défaut en bas de l'écran."
 echo "Bouton Share PS4 toggle Polybar."
 echo "CPU Ryzen optimisé (microcode + mode performance)."
 echo "Drivers AMD + Vulkan installés pour GPU Radeon 680M."
+echo "Important pour désactivé la bar du haut execute cette commande après avoir redémarrer le PC : gnome-extensions enable hidetopbar@mathieu.bidon.ca"
 echo
 read -rp "Redémarrer maintenant ? (y/N) " REBOOT
 if [[ "$REBOOT" =~ ^([yY][eE][sS]|[yY])$ ]]; then
