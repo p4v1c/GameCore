@@ -63,106 +63,16 @@ sudo systemctl enable --now cpupower.service
 sudo cpupower frequency-set -g performance
 sudo systemctl enable --now thermald.service
 
+# --- Clean Gnome ---
+
+sudo apt remove gnome-shell-extension-ubuntu-dock
+
 # --- RetroArch via Flatpak ---
 echo "=== Installation RetroArch ==="
 if ! flatpak remote-list | grep -q flathub; then
   sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 fi
 flatpak install -y flathub org.libretro.RetroArch || true
-
-# --- Configuration i3 + Polybar ---
-echo "=== Configuration i3 + Polybar ==="
-I3_CONFIG="/home/$USER_NAME/.config/i3/config"
-sudo -u "$USER_NAME" mkdir -p "$(dirname "$I3_CONFIG")"
-
-# Fond d'écran + Polybar cachée
-sudo -u "$USER_NAME" bash -c "cat >> $I3_CONFIG <<'EOF'
-
-# Fond d'écran au démarrage
-exec --no-startup-id feh --bg-scale $GAMECORE_PATH/background.png
-
-# Toggle Polybar avec Alt+b (utilisé par bouton Share)
-bindsym Mod1+b exec pkill -x polybar || polybar main &
-EOF"
-
-# --- Config Polybar ---
-POLYBAR_DIR="/home/$USER_NAME/.config/polybar"
-sudo -u "$USER_NAME" mkdir -p "$POLYBAR_DIR"
-
-sudo -u "$USER_NAME" bash -c "cat > $POLYBAR_DIR/config.ini <<'EOF'
-[bar/main]
-width = 100%
-height = 28
-bottom = true
-background = #222222
-foreground = #ffffff
-font-0 = monospace:style=Bold:pixelsize=12
-override-redirect = true  ; barre cachée par défaut
-
-modules-left = cpu memory gpu
-modules-center = disk
-modules-right = temp network date
-
-[module/cpu]
-type = internal/cpu
-format = CPU: <total>%
-interval = 2
-
-[module/memory]
-type = internal/memory
-interval = 5
-format = RAM: <used>/<total>
-
-[module/gpu]
-type = custom/script
-exec = radeontop -d - -l 1 | awk '/gpu/ {print \"GPU: \"$3\"%\"; exit}'
-interval = 3
-
-[module/disk]
-type = internal/fs
-mount-0 = /
-label-mounted = SSD: %used%/%total%
-
-[module/temp]
-type = custom/script
-exec = sensors | awk '/Tctl/ {print \"Temp: \"$2}'
-interval = 5
-
-[module/network]
-type = internal/network
-interface = $(ip route get 1.1.1.1 | awk '/dev/ {print $5; exit}')
-interval = 3
-format-connected = Net: <downspeed> ↓↑ <upspeed>
-EOF"
-
-# --- Installation et config AntimicroX pour PS4 Share button ---
-echo "=== Installation AntimicroX et mapping bouton Share → Alt+b ==="
-ANTI_DIR="/home/$USER_NAME/.config/antimicrox"
-sudo -u "$USER_NAME" mkdir -p "$ANTI_DIR"
-
-sudo -u "$USER_NAME" bash -c "cat > $ANTI_DIR/ps4-polybar.gamecontroller.amgp <<'EOF'
-<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<antimicroprofile>
-    <controller id=\"0\" name=\"PS4 Controller\">
-        <button index=\"8\">
-            <mapping>
-                <key>Alt+b</key>
-            </mapping>
-        </button>
-    </controller>
-</antimicroprofile>
-EOF"
-
-# Auto-lancement AntimicroX au démarrage
-AUTOSTART_DIR="/home/$USER_NAME/.config/autostart"
-sudo -u "$USER_NAME" mkdir -p "$AUTOSTART_DIR"
-
-sudo -u "$USER_NAME" bash -c "cat > $AUTOSTART_DIR/antimicrox.desktop <<'EOF'
-[Desktop Entry]
-Type=Application
-Name=AntimicroX
-Exec=antimicrox --profile /home/$USER_NAME/.config/antimicrox/ps4-polybar.gamecontroller.amgp --tray
-EOF"
 
 # --- Autostart GameCore ---
 sudo -u "$USER_NAME" mkdir -p "$AUTOSTART_DIR"
