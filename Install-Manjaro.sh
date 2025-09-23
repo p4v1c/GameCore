@@ -55,8 +55,8 @@ sudo pacman -S --noconfirm amd-ucode mesa xf86-video-amdgpu vulkan-radeon lib32-
   linux$(uname -r | cut -d- -f1,2)-headers base-devel git
 
 # --- Installation des dépendances générales ---
-echo "=== Installation Qt, SDL2, make, flatpak, samba, ssh, feh, optimisation CPU, Polybar ==="
-sudo pacman -S --noconfirm qt5-base qt5-tools sdl2 make flatpak samba openssh feh cpupower thermald polybar lm_sensors
+echo "=== Installation Qt, SDL2, make, flatpak, samba, ssh, feh, optimisation CPU, Polybar, AntimicroX ==="
+sudo pacman -S --noconfirm qt5-base qt5-tools sdl2 make flatpak samba openssh feh cpupower thermald polybar lm_sensors antimicrox radeontop
 
 # --- Activation services CPU & thermald pour perf & stabilité ===
 sudo systemctl enable --now cpupower.service
@@ -75,14 +75,14 @@ echo "=== Configuration i3 + Polybar ==="
 I3_CONFIG="/home/$USER_NAME/.config/i3/config"
 sudo -u "$USER_NAME" mkdir -p "$(dirname "$I3_CONFIG")"
 
-# Ajout du fond d'écran + lancement polybar
+# Fond d'écran + Polybar cachée
 sudo -u "$USER_NAME" bash -c "cat >> $I3_CONFIG <<'EOF'
 
 # Fond d'écran au démarrage
 exec --no-startup-id feh --bg-scale $GAMECORE_PATH/background.png
 
-# Lancer Polybar
-exec_always --no-startup-id polybar main
+# Toggle Polybar avec Alt+b (utilisé par bouton Share)
+bindsym Mod1+b exec pkill -x polybar || polybar main &
 EOF"
 
 # --- Config Polybar ---
@@ -97,9 +97,7 @@ bottom = true
 background = #222222
 foreground = #ffffff
 font-0 = monospace:style=Bold:pixelsize=12
-
-# Auto-hide avec Alt (Mod1)
-override-redirect = true
+override-redirect = true  ; barre cachée par défaut
 
 modules-left = cpu memory gpu
 modules-center = disk
@@ -107,9 +105,8 @@ modules-right = temp network date
 
 [module/cpu]
 type = internal/cpu
-format = <label> <total>%
+format = CPU: <total>%
 interval = 2
-label = CPU:
 
 [module/memory]
 type = internal/memory
@@ -124,7 +121,7 @@ interval = 3
 [module/disk]
 type = internal/fs
 mount-0 = /
-label-mounted = "SSD: %used%/%total%"
+label-mounted = SSD: %used%/%total%
 
 [module/temp]
 type = custom/script
@@ -135,7 +132,7 @@ interval = 5
 type = internal/network
 interface = $(ip route get 1.1.1.1 | awk '/dev/ {print $5; exit}')
 interval = 3
-format-connected = "Net: <downspeed> ↓↑ <upspeed>"
+format-connected = Net: <downspeed> ↓↑ <upspeed>
 
 [module/date]
 type = internal/date
@@ -143,10 +140,38 @@ interval = 1
 date = %d-%m-%Y %H:%M:%S
 EOF"
 
-# --- Autostart GameCore ---
+# --- Installation et config AntimicroX pour PS4 Share button ---
+echo "=== Installation AntimicroX et mapping bouton Share → Alt+b ==="
+ANTI_DIR="/home/$USER_NAME/.config/antimicrox"
+sudo -u "$USER_NAME" mkdir -p "$ANTI_DIR"
+
+sudo -u "$USER_NAME" bash -c "cat > $ANTI_DIR/ps4-polybar.gamecontroller.amgp <<'EOF'
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<antimicroprofile>
+    <controller id=\"0\" name=\"PS4 Controller\">
+        <button index=\"8\">
+            <mapping>
+                <key>Alt+b</key>
+            </mapping>
+        </button>
+    </controller>
+</antimicroprofile>
+EOF"
+
+# Auto-lancement AntimicroX au démarrage
 AUTOSTART_DIR="/home/$USER_NAME/.config/autostart"
 sudo -u "$USER_NAME" mkdir -p "$AUTOSTART_DIR"
 
+sudo -u "$USER_NAME" bash -c "cat > $AUTOSTART_DIR/antimicrox.desktop <<'EOF'
+[Desktop Entry]
+Type=Application
+Name=AntimicroX
+Exec=antimicrox --profile /home/$USER_NAME/.config/antimicrox/ps4-polybar.gamecontroller.amgp --tray
+X-GNOME-Autostart-enabled=true
+EOF"
+
+# --- Autostart GameCore ---
+sudo -u "$USER_NAME" mkdir -p "$AUTOSTART_DIR"
 DESKTOP_FILE="$AUTOSTART_DIR/GameCore.desktop"
 sudo -u "$USER_NAME" bash -c "cat > $DESKTOP_FILE <<EOF
 [Desktop Entry]
@@ -193,7 +218,8 @@ echo "GameCore compilé et autostart configuré."
 echo "Samba configuré (utilisateur : $USER_NAME)."
 echo "SSH activé."
 echo "RetroArch installé via Flatpak."
-echo "Polybar installé et configuré en bas de l'écran avec CPU/GPU/RAM/SSD/Temp/Réseau."
+echo "Polybar installé et caché par défaut en bas de l'écran."
+echo "Bouton Share PS4 toggle Polybar."
 echo "CPU Ryzen optimisé (microcode + mode performance)."
 echo "Drivers AMD + Vulkan installés pour GPU Radeon 680M."
 echo
