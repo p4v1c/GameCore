@@ -55,8 +55,8 @@ sudo pacman -S --noconfirm amd-ucode mesa xf86-video-amdgpu vulkan-radeon lib32-
   linux$(uname -r | cut -d- -f1,2)-headers base-devel git
 
 # --- Installation des dépendances générales ---
-echo "=== Installation Qt, SDL2, make, flatpak, samba, ssh, feh, optimisation CPU ==="
-sudo pacman -S --noconfirm qt5-base qt5-tools sdl2 make flatpak samba openssh feh cpupower thermald
+echo "=== Installation Qt, SDL2, make, flatpak, samba, ssh, feh, optimisation CPU, Polybar ==="
+sudo pacman -S --noconfirm qt5-base qt5-tools sdl2 make flatpak samba openssh feh cpupower thermald polybar lm_sensors
 
 # --- Activation services CPU & thermald pour perf & stabilité ===
 sudo systemctl enable --now cpupower.service
@@ -70,23 +70,77 @@ if ! flatpak remote-list | grep -q flathub; then
 fi
 flatpak install -y flathub org.libretro.RetroArch || true
 
-# --- Configuration i3 ---
-echo "=== Configuration i3 ==="
+# --- Configuration i3 + Polybar ---
+echo "=== Configuration i3 + Polybar ==="
 I3_CONFIG="/home/$USER_NAME/.config/i3/config"
 sudo -u "$USER_NAME" mkdir -p "$(dirname "$I3_CONFIG")"
 
-# Ajout du fond d'écran et config de la barre cachée
+# Ajout du fond d'écran + lancement polybar
 sudo -u "$USER_NAME" bash -c "cat >> $I3_CONFIG <<'EOF'
 
 # Fond d'écran au démarrage
 exec --no-startup-id feh --bg-scale $GAMECORE_PATH/background.png
 
-# Barre auto-cachée (se montre avec ALT / Mod1)
-bar {
-    mode hide
-    hidden_state hide
-    modifier Mod1
-}
+# Lancer Polybar
+exec_always --no-startup-id polybar main
+EOF"
+
+# --- Config Polybar ---
+POLYBAR_DIR="/home/$USER_NAME/.config/polybar"
+sudo -u "$USER_NAME" mkdir -p "$POLYBAR_DIR"
+
+sudo -u "$USER_NAME" bash -c "cat > $POLYBAR_DIR/config.ini <<'EOF'
+[bar/main]
+width = 100%
+height = 28
+bottom = true
+background = #222222
+foreground = #ffffff
+font-0 = monospace:style=Bold:pixelsize=12
+
+# Auto-hide avec Alt (Mod1)
+override-redirect = true
+
+modules-left = cpu memory gpu
+modules-center = disk
+modules-right = temp network date
+
+[module/cpu]
+type = internal/cpu
+format = <label> <total>%
+interval = 2
+label = CPU:
+
+[module/memory]
+type = internal/memory
+interval = 5
+format = RAM: <used>/<total>
+
+[module/gpu]
+type = custom/script
+exec = radeontop -d - -l 1 | awk '/gpu/ {print \"GPU: \"$3\"%\"; exit}'
+interval = 3
+
+[module/disk]
+type = internal/fs
+mount-0 = /
+label-mounted = "SSD: %used%/%total%"
+
+[module/temp]
+type = custom/script
+exec = sensors | awk '/Tctl/ {print \"Temp: \"$2}'
+interval = 5
+
+[module/network]
+type = internal/network
+interface = $(ip route get 1.1.1.1 | awk '/dev/ {print $5; exit}')
+interval = 3
+format-connected = "Net: <downspeed> ↓↑ <upspeed>"
+
+[module/date]
+type = internal/date
+interval = 1
+date = %d-%m-%Y %H:%M:%S
 EOF"
 
 # --- Autostart GameCore ---
@@ -139,7 +193,7 @@ echo "GameCore compilé et autostart configuré."
 echo "Samba configuré (utilisateur : $USER_NAME)."
 echo "SSH activé."
 echo "RetroArch installé via Flatpak."
-echo "i3 configuré avec fond d'écran et barre auto-cachée."
+echo "Polybar installé et configuré en bas de l'écran avec CPU/GPU/RAM/SSD/Temp/Réseau."
 echo "CPU Ryzen optimisé (microcode + mode performance)."
 echo "Drivers AMD + Vulkan installés pour GPU Radeon 680M."
 echo
