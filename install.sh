@@ -59,6 +59,11 @@ sudo apt install -y \
 echo "=== Installation i3 et configuration auto-start ==="
 sudo apt install -y i3 dmenu xinit
 
+# --- Installation de feh et configuration du fond d'écran ---
+sudo apt install -y feh
+sudo -u "$USER_NAME" bash -c "echo 'exec --no-startup-id feh --bg-scale $GAMECORE_PATH/background.png' >> /home/$USER_NAME/.config/i3/config"
+
+
 # Création du fichier .xinitrc pour lancer i3
 sudo -u "$USER_NAME" bash -c "echo 'exec i3' > /home/$USER_NAME/.xinitrc"
 
