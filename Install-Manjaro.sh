@@ -113,7 +113,9 @@ EOF
 
 # === Samba ===
 msg "Configuration Samba"
-sudo cp /etc/samba/smb.conf /etc/samba/smb.conf.bak.$(date +%s)
+if [ -f /etc/samba/smb.conf ]; then
+    sudo cp /etc/samba/smb.conf /etc/samba/smb.conf.bak.$(date +%s)
+fi
 sudo tee -a /etc/samba/smb.conf >/dev/null <<EOF
 
 [ROMS]
@@ -142,7 +144,6 @@ echo "Samba configuré (utilisateur : $USER_NAME)."
 echo "SSH activé."
 echo "RetroArch installé via Flatpak."
 echo "Drivers AMD + Vulkan installés."
-echo "Pour activer HideTopBar après redémarrage :"
 
 read -rp "Redémarrer maintenant ? (y/N) " REBOOT
 if [[ "$REBOOT" =~ ^([yY][eE][sS]|[yY])$ ]]; then
