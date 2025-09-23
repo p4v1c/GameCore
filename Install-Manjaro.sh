@@ -133,11 +133,6 @@ type = internal/network
 interface = $(ip route get 1.1.1.1 | awk '/dev/ {print $5; exit}')
 interval = 3
 format-connected = Net: <downspeed> ↓↑ <upspeed>
-
-[module/date]
-type = internal/date
-interval = 1
-date = %d-%m-%Y %H:%M:%S
 EOF"
 
 # --- Installation et config AntimicroX pour PS4 Share button ---
@@ -179,7 +174,6 @@ Type=Application
 Name=GameCore
 Exec=$GAMECORE_PATH/build/GameCore
 WorkingDirectory=$GAMECORE_PATH
-X-GNOME-Autostart-enabled=true
 EOF"
 
 # --- Compilation GameCore ---
