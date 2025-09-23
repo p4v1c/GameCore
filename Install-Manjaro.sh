@@ -53,6 +53,18 @@ sudo find "$GAMECORE_PATH" -iname "*example*" -exec rm -rf {} +
 msg "Mise à jour système et installation drivers/headers"
 sudo pacman -Syu --noconfirm
 
+# === Wallpaper ===
+WALLPAPER_PATH="$GAMECORE_PATH/background.png"
+if [ -f "$WALLPAPER_PATH" ]; then
+  msg "Configuration du fond d'écran pour $USER_NAME"
+  sudo -u "$USER_NAME" DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u $USER_NAME)/bus \
+    gsettings set org.gnome.desktop.background picture-uri "file://$WALLPAPER_PATH"
+  sudo -u "$USER_NAME" DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u $USER_NAME)/bus \
+    gsettings set org.gnome.desktop.background picture-options "scaled"
+else
+  echo "⚠️ Le fichier $WALLPAPER_PATH n'existe pas. Pas de fond d'écran configuré."
+fi
+
 # Détecter headers noyau
 KERNEL=$(uname -r)
 if pacman -Ss "^linux-headers$" >/dev/null 2>&1; then
