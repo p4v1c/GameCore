@@ -55,6 +55,25 @@ sudo apt install -y \
   qtbase5-dev qtbase5-dev-tools qtchooser qt5-qmake qttools5-dev qttools5-dev-tools \
   libsdl2-dev make flatpak openssh-server samba build-essential
 
+# --- Installation i3 et configuration auto-start ---
+echo "=== Installation i3 et configuration auto-start ==="
+sudo apt install -y i3 dmenu xinit
+
+# Création du fichier .xinitrc pour lancer i3
+sudo -u "$USER_NAME" bash -c "echo 'exec i3' > /home/$USER_NAME/.xinitrc"
+
+# Modification de .bash_profile pour lancer startx automatiquement sur TTY1
+BASH_PROFILE="/home/$USER_NAME/.bash_profile"
+sudo -u "$USER_NAME" bash -c "cat >> $BASH_PROFILE <<'EOF'
+
+# Auto-start X et i3 sur TTY1
+if [[ -z \$DISPLAY ]] && [[ \$(tty) == /dev/tty1 ]]; then
+    startx
+fi
+EOF"
+
+echo "✅ i3 installé et configuré pour démarrer automatiquement au login TTY1."
+
 # --- RetroArch via Flatpak ---
 echo "=== Installation RetroArch ==="
 if ! flatpak remote-list | grep -q flathub; then
@@ -69,33 +88,20 @@ echo "Télécharge manuellement :"
 echo "  - Ryujinx : https://git.ryujinx.app/ryubing/ryujinx/-/releases"
 echo "  - RPCS3   : https://rpcs3.net/download"
 
-# --- Service utilisateur GameCore (GUI) ---
-echo "=== Création du service utilisateur GameCore ==="
-USER_SERVICE_DIR="/home/$USER_NAME/.config/systemd/user"
-sudo -u "$USER_NAME" mkdir -p "$USER_SERVICE_DIR"
+# --- Autostart GameCore sous i3 ---
+echo "=== Configuration autostart GameCore ==="
+AUTOSTART_DIR="/home/$USER_NAME/.config/autostart"
+sudo -u "$USER_NAME" mkdir -p "$AUTOSTART_DIR"
 
-SERVICE_PATH="$USER_SERVICE_DIR/GameCore.service"
-sudo -u "$USER_NAME" bash -c "cat > $SERVICE_PATH <<EOF
-[Unit]
-Description=GameCore
-After=graphical-session.target
-
-[Service]
-ExecStart=$GAMECORE_PATH/build/GameCore
+DESKTOP_FILE="$AUTOSTART_DIR/GameCore.desktop"
+sudo -u "$USER_NAME" bash -c "cat > $DESKTOP_FILE <<EOF
+[Desktop Entry]
+Type=Application
+Name=GameCore
+Exec=$GAMECORE_PATH/build/GameCore
 WorkingDirectory=$GAMECORE_PATH
-Environment=DISPLAY=:0
-Environment=HOME=/home/$USER_NAME
-Environment=XDG_DATA_DIRS=/home/$USER_NAME/.local/share:/usr/local/share:/usr/share
-Restart=always
-
-[Install]
-WantedBy=default.target
+X-GNOME-Autostart-enabled=true
 EOF"
-
-# Activation du service utilisateur
-sudo -u "$USER_NAME" systemctl --user daemon-reload
-sudo -u "$USER_NAME" systemctl --user enable GameCore.service
-sudo -u "$USER_NAME" systemctl --user start GameCore.service
 
 # --- Compilation GameCore ---
 echo "=== Compilation de GameCore ==="
@@ -127,16 +133,6 @@ printf "%s\n%s\n" "$SMB_PASS" "$SMB_PASS" | sudo smbpasswd -s -a "$USER_NAME"
 
 sudo systemctl restart smbd nmbd
 
-# --- GDM3 auto-login ---
-if [ -f /etc/gdm3/custom.conf ]; then
-  echo "=== Configuration GDM3 auto-login ==="
-  sudo bash -c "cat > /etc/gdm3/custom.conf <<EOF
-[daemon]
-AutomaticLoginEnable = true
-AutomaticLogin = $USER_NAME
-EOF"
-fi
-
 # --- SSH ---
 sudo systemctl enable ssh
 sudo systemctl start ssh
@@ -144,10 +140,11 @@ sudo systemctl start ssh
 # --- Fin ---
 echo
 echo "=== Installation terminée ==="
-echo "GameCore compilé et service utilisateur activé."
+echo "GameCore compilé et autostart configuré (fichier GameCore.desktop)."
 echo "Samba configuré (utilisateur : $USER_NAME)."
 echo "SSH activé."
 echo "RetroArch installé via Flatpak."
+echo "i3 installé et configuré pour démarrage automatique."
 echo
 echo "➡️ Tu peux maintenant supprimer le dossier source '../GameCore' si tu veux libérer de l’espace."
 echo
