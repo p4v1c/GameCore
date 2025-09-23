@@ -77,11 +77,6 @@ sudo systemctl enable --now cpupower.service
 sudo cpupower frequency-set -g performance || true
 sudo systemctl enable --now thermald.service || true
 
-# === Extensions GNOME ===
-msg "Nettoyage extensions GNOME"
-sudo pacman -R gnome-layout-switcher
-sudo pacman -R gnome-shell-extension-dash-to-dock
-
 
 # === RetroArch ===
 msg "Installation RetroArch via Flatpak"
