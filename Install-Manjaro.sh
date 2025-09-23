@@ -101,18 +101,6 @@ if ! flatpak remote-list | grep -q flathub; then
 fi
 flatpak install -y flathub org.libretro.RetroArch || true
 
-# === Autostart GameCore ===
-msg "Configuration autostart"
-sudo -u "$USER_NAME" mkdir -p "$AUTOSTART_DIR"
-DESKTOP_FILE="$AUTOSTART_DIR/GameCore.desktop"
-sudo -u "$USER_NAME" tee "$DESKTOP_FILE" >/dev/null <<EOF
-[Desktop Entry]
-Type=Application
-Name=GameCore
-Exec=$GAMECORE_PATH/build/GameCore
-WorkingDirectory=$GAMECORE_PATH
-EOF
-
 # === Compilation GameCore ===
 msg "Compilation GameCore"
 sudo -u "$USER_NAME" mkdir -p "$GAMECORE_PATH/build"
@@ -125,6 +113,20 @@ else
 fi
 sudo -u "$USER_NAME" $QMAKE_BIN compile.pro
 sudo -u "$USER_NAME" make -j"$(nproc)"
+
+# === Autostart GameCore (après compilation) ===
+msg "Configuration autostart"
+sudo -u "$USER_NAME" mkdir -p "$AUTOSTART_DIR"
+DESKTOP_FILE="$AUTOSTART_DIR/GameCore.desktop"
+sudo -u "$USER_NAME" tee "$DESKTOP_FILE" >/dev/null <<EOF
+[Desktop Entry]
+Type=Application
+Name=GameCore
+Exec=$GAMECORE_PATH/build/GameCore
+WorkingDirectory=$GAMECORE_PATH/build
+Terminal=false
+StartupNotify=false
+EOF
 
 # === Samba ===
 msg "Configuration Samba"
