@@ -53,18 +53,6 @@ sudo find "$GAMECORE_PATH" -iname "*example*" -exec rm -rf {} +
 msg "Mise à jour système et installation drivers/headers"
 sudo pacman -Syu --noconfirm
 
-# === Wallpaper ===
-WALLPAPER_PATH="$GAMECORE_PATH/background.png"
-if [ -f "$WALLPAPER_PATH" ]; then
-  msg "Configuration du fond d'écran pour $USER_NAME"
-  sudo -u "$USER_NAME" DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u $USER_NAME)/bus \
-    gsettings set org.gnome.desktop.background picture-uri "file://$WALLPAPER_PATH"
-  sudo -u "$USER_NAME" DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u $USER_NAME)/bus \
-    gsettings set org.gnome.desktop.background picture-options "scaled"
-else
-  echo "⚠️ Le fichier $WALLPAPER_PATH n'existe pas. Pas de fond d'écran configuré."
-fi
-
 # Détecter headers noyau
 KERNEL=$(uname -r)
 if pacman -Ss "^linux-headers$" >/dev/null 2>&1; then
@@ -91,8 +79,9 @@ sudo systemctl enable --now thermald.service || true
 
 # === Extensions GNOME ===
 msg "Nettoyage extensions GNOME"
-gnome-extensions list | grep -q dash-to-dock@micxgx.gmail.com && \
-  gnome-extensions disable dash-to-dock@micxgx.gmail.com || true
+sudo pacman -R gnome-layout-switcher
+sudo pacman -R gnome-shell-extension-dash-to-dock
+
 
 # === RetroArch ===
 msg "Installation RetroArch via Flatpak"
@@ -122,8 +111,7 @@ sudo -u "$USER_NAME" tee "$DESKTOP_FILE" >/dev/null <<EOF
 [Desktop Entry]
 Type=Application
 Name=GameCore
-Exec=$GAMECORE_PATH/build/GameCore
-WorkingDirectory=$GAMECORE_PATH/build
+Exec=bash -c 'cd $GAMECORE_PATH/build && ./GameCore'
 Terminal=false
 StartupNotify=false
 EOF
@@ -160,7 +148,6 @@ echo "SSH activé."
 echo "RetroArch installé via Flatpak."
 echo "Drivers AMD + Vulkan installés."
 echo "Pour activer HideTopBar après redémarrage :"
-echo "  gnome-extensions enable hidetopbar@mathieu.bidon.ca"
 
 read -rp "Redémarrer maintenant ? (y/N) " REBOOT
 if [[ "$REBOOT" =~ ^([yY][eE][sS]|[yY])$ ]]; then
