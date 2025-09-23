@@ -1,138 +1,162 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# --- PROMPTS ---
+# === Fonctions utilitaires ===
+msg() { echo -e "\n\033[1;32m==> $*\033[0m"; }
+err() { echo -e "\n\033[1;31m[ERREUR]\033[0m $*" >&2; exit 1; }
+
+# === PROMPTS ===
 read -rp "Nom de l'utilisateur système (ex: p4v1c) : " USER_NAME
 read -rp "Chemin d'installation de GameCore (ex: /opt/GameCore) : " GAMECORE_PATH
 read -rsp "Mot de passe Samba pour l'utilisateur $USER_NAME : " SMB_PASS
 echo
 
-# --- Variables ---
+# === Variables ===
 GAMECORE_PARENT_DIR=$(dirname "$GAMECORE_PATH")
+AUTOSTART_DIR="/home/$USER_NAME/.config/autostart"
 
-echo
-echo "=== Résumé des paramètres ==="
+msg "Résumé des paramètres"
 echo "Utilisateur : $USER_NAME"
 echo "GameCore path : $GAMECORE_PATH"
-echo "---------------------------------"
 sleep 1
 
-# Vérifier que l'utilisateur existe
+# === Vérification utilisateur ===
 if ! id "$USER_NAME" >/dev/null 2>&1; then
-  echo "L'utilisateur '$USER_NAME' n'existe pas. Veux-tu le créer maintenant ? (y/N)"
-  read -r CREATE_USER
+  read -rp "L'utilisateur '$USER_NAME' n'existe pas. Créer maintenant ? (y/N) " CREATE_USER
   if [[ "$CREATE_USER" =~ ^([yY][eE][sS]|[yY])$ ]]; then
     sudo useradd -m -s /bin/bash "$USER_NAME"
-    echo "Utilisateur $USER_NAME créé."
+    msg "Utilisateur $USER_NAME créé."
   else
-    echo "Impossible de continuer sans utilisateur existant. Sortie."
-    exit 1
+    err "Impossible de continuer sans utilisateur."
   fi
 fi
 
-# --- Préparation répertoire et copie GameCore ---
-echo "=== Préparation du répertoire $GAMECORE_PARENT_DIR ==="
+# === Répertoire GameCore ===
+msg "Préparation du répertoire $GAMECORE_PARENT_DIR"
 sudo mkdir -p "$GAMECORE_PARENT_DIR"
-sudo chmod 777 "$GAMECORE_PARENT_DIR"
+sudo chmod 755 "$GAMECORE_PARENT_DIR"
 
 if [ -d "../GameCore" ]; then
-  echo "Copie du contenu de ../GameCore vers $GAMECORE_PATH ..."
+  msg "Copie de ../GameCore vers $GAMECORE_PATH"
   sudo cp -r ../GameCore/. "$GAMECORE_PATH"
 else
-  echo "⚠️ ../GameCore n'existe pas. Création du dossier cible vide."
+  msg "⚠️ ../GameCore introuvable. Création dossier vide."
   sudo mkdir -p "$GAMECORE_PATH"
 fi
 sudo chown -R "${USER_NAME}:${USER_NAME}" "$GAMECORE_PATH"
 
-# --- Nettoyage fichiers 'example' ---
-echo "=== Suppression des fichiers/dossiers contenant 'example' dans $GAMECORE_PATH ==="
+# === Nettoyage fichiers 'example' ===
+msg "Suppression des fichiers contenant 'example'"
 sudo find "$GAMECORE_PATH" -iname "*example*" -exec rm -rf {} +
 
-# --- Mise à jour système, microcode, drivers AMD et Vulkan ---
-echo "=== Mise à jour système et installation microcode AMD, drivers GPU et Vulkan ==="
+# === Paquets système ===
+msg "Mise à jour système et installation drivers/headers"
 sudo pacman -Syu --noconfirm
+
+# Détecter headers noyau
+KERNEL=$(uname -r)
+if pacman -Ss "^linux-headers$" >/dev/null 2>&1; then
+  HEADERS="linux-headers"
+elif [[ $KERNEL == *zen* ]]; then
+  HEADERS="linux-zen-headers"
+else
+  HEADERS="linux-headers"
+fi
+
 sudo pacman -S --noconfirm amd-ucode mesa xf86-video-amdgpu vulkan-radeon lib32-vulkan-radeon \
-  linux$(uname -r | cut -d- -f1,2)-headers base-devel git
+  "$HEADERS" base-devel git
 
-# --- Installation des dépendances générales ---
-echo "=== Installation Qt, SDL2, make, flatpak, samba, ssh, feh, optimisation CPU, Polybar, AntimicroX ==="
-sudo pacman -S --noconfirm qt5-base qt5-tools sdl2 make flatpak samba openssh feh cpupower thermald polybar lm_sensors antimicrox radeontop
+# === Dépendances générales ===
+msg "Installation dépendances"
+sudo pacman -S --noconfirm qt5-base qt5-tools sdl2 make flatpak samba openssh feh \
+  cpupower thermald polybar lm_sensors antimicrox radeontop
 
-# --- Activation services CPU & thermald pour perf & stabilité ===
+# === Services CPU & thermald ===
+msg "Activation services CPU et thermald"
 sudo systemctl enable --now cpupower.service
-sudo cpupower frequency-set -g performance
-sudo systemctl enable --now thermald.service
+sudo cpupower frequency-set -g performance || true
+sudo systemctl enable --now thermald.service || true
 
-# --- Clean Gnome ---
+# === Extensions GNOME ===
+msg "Nettoyage extensions GNOME"
+gnome-extensions list | grep -q dash-to-dock@micxgx.gmail.com && \
+  gnome-extensions disable dash-to-dock@micxgx.gmail.com || true
 
-gnome-extensions disable dash-to-dock@micxgx.gmail.com
-
-sudo pacman -S --needed git base-devel
+# Installer hidetopbar via AUR (non-root)
+TMPDIR=$(mktemp -d)
+pushd "$TMPDIR"
 git clone https://aur.archlinux.org/gnome-shell-extension-hidetopbar-git.git
 cd gnome-shell-extension-hidetopbar-git
-makepkg -si
+sudo -u "$USER_NAME" makepkg -si --noconfirm
+popd
+rm -rf "$TMPDIR"
 
-
-# --- RetroArch via Flatpak ---
-echo "=== Installation RetroArch ==="
+# === RetroArch ===
+msg "Installation RetroArch via Flatpak"
 if ! flatpak remote-list | grep -q flathub; then
   sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 fi
 flatpak install -y flathub org.libretro.RetroArch || true
 
-# --- Autostart GameCore ---
+# === Autostart GameCore ===
+msg "Configuration autostart"
 sudo -u "$USER_NAME" mkdir -p "$AUTOSTART_DIR"
 DESKTOP_FILE="$AUTOSTART_DIR/GameCore.desktop"
-sudo -u "$USER_NAME" bash -c "cat > $DESKTOP_FILE <<EOF
+sudo -u "$USER_NAME" tee "$DESKTOP_FILE" >/dev/null <<EOF
 [Desktop Entry]
 Type=Application
 Name=GameCore
 Exec=$GAMECORE_PATH/build/GameCore
 WorkingDirectory=$GAMECORE_PATH
-EOF"
+EOF
 
-# --- Compilation GameCore ---
+# === Compilation GameCore ===
+msg "Compilation GameCore"
 sudo -u "$USER_NAME" mkdir -p "$GAMECORE_PATH/build"
 cd "$GAMECORE_PATH/build"
-sudo -u "$USER_NAME" qmake ../compile.pro
+
+if command -v qmake6 >/dev/null; then
+  QMAKE_BIN=qmake6
+else
+  QMAKE_BIN=qmake
+fi
+sudo -u "$USER_NAME" $QMAKE_BIN ../compile.pro
 sudo -u "$USER_NAME" make -j"$(nproc)"
 
-# --- Samba configuration ---
+# === Samba ===
+msg "Configuration Samba"
 sudo cp /etc/samba/smb.conf /etc/samba/smb.conf.bak.$(date +%s)
-sudo bash -c "cat >> /etc/samba/smb.conf <<EOF
+sudo tee -a /etc/samba/smb.conf >/dev/null <<EOF
 
 [ROMS]
-   comment = Dossier pour stocker les ROMS
+   comment = Dossier ROMS
    path = $GAMECORE_PATH/emu/
    browseable = yes
    read only = no
    writable = yes
    create mask = 0755
    valid users = $USER_NAME
-EOF"
+EOF
 
 sudo mkdir -p "$GAMECORE_PATH/emu/"
 sudo chown -R "$USER_NAME:$USER_NAME" "$GAMECORE_PATH/emu/"
 printf "%s\n%s\n" "$SMB_PASS" "$SMB_PASS" | sudo smbpasswd -s -a "$USER_NAME"
 sudo systemctl restart smb.service nmb.service || true
 
-# --- SSH ---
-sudo systemctl enable sshd
-sudo systemctl start sshd
+# === SSH ===
+msg "Activation SSH"
+sudo systemctl enable --now sshd
 
-# --- Fin ---
-echo
-echo "=== Installation terminée ==="
+# === Fin ===
+msg "Installation terminée"
 echo "GameCore compilé et autostart configuré."
 echo "Samba configuré (utilisateur : $USER_NAME)."
 echo "SSH activé."
 echo "RetroArch installé via Flatpak."
-echo "Polybar installé et caché par défaut en bas de l'écran."
-echo "Bouton Share PS4 toggle Polybar."
-echo "CPU Ryzen optimisé (microcode + mode performance)."
-echo "Drivers AMD + Vulkan installés pour GPU Radeon 680M."
-echo "Important pour désactivé la bar du haut execute cette commande après avoir redémarrer le PC : gnome-extensions enable hidetopbar@mathieu.bidon.ca"
-echo
+echo "Drivers AMD + Vulkan installés."
+echo "Pour activer HideTopBar après redémarrage :"
+echo "  gnome-extensions enable hidetopbar@mathieu.bidon.ca"
+
 read -rp "Redémarrer maintenant ? (y/N) " REBOOT
 if [[ "$REBOOT" =~ ^([yY][eE][sS]|[yY])$ ]]; then
   sudo systemctl reboot
