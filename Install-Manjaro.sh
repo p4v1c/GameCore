@@ -162,7 +162,6 @@ sudo -u "$USER_NAME" bash -c "cat > $AUTOSTART_DIR/antimicrox.desktop <<'EOF'
 Type=Application
 Name=AntimicroX
 Exec=antimicrox --profile /home/$USER_NAME/.config/antimicrox/ps4-polybar.gamecontroller.amgp --tray
-X-GNOME-Autostart-enabled=true
 EOF"
 
 # --- Autostart GameCore ---
@@ -186,8 +185,8 @@ sudo -u "$USER_NAME" make -j"$(nproc)"
 sudo cp /etc/samba/smb.conf /etc/samba/smb.conf.bak.$(date +%s)
 sudo bash -c "cat >> /etc/samba/smb.conf <<EOF
 
-[partage_prive]
-   comment = Rom
+[ROMS]
+   comment = Dossier pour stocker les ROMS
    path = $GAMECORE_PATH/emu/
    browseable = yes
    read only = no
