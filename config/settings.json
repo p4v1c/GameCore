@@ -51,8 +51,8 @@
     },
     "rpcs3": {
         "name": "RPCS3",
-        "path": "../lib/rpcs3.AppImage",
-        "args": " --fullscreen"
+        "path": "flatpak",
+        "args": "run net.rpcs3.RPCS3 -f"
     },
     "Ryujinx ": {
         "name": "citron",
