@@ -11,7 +11,7 @@ Important connect ta mannette avant de d'installer GameCore
 ====================
 
 
-Mettre l'appimage dans le dossier lib
+Mettre l'appimage dans le dossier lib (citron.Appimage)
 Désactiver la veille .
 
 ## Automatic Installation
