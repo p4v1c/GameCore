@@ -55,8 +55,8 @@
         "args": " --fullscreen"
     },
     "Ryujinx ": {
-        "name": "Ryujinx",
-        "path": "../lib/ryujinx.AppImage",
+        "name": "citron",
+        "path": "../lib/citron.AppImage",
         "args": "--fullscreen"
     }
 }

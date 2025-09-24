@@ -13,7 +13,7 @@
 
 ====================
 
-Mettre les appimage dans le dossier et renomer citron par Ryujinx.
+Mettre les appimage dans le dossier et renommer Ryujinx par citron.
 Désactiver la veille .
 
 ## Automatic Installation

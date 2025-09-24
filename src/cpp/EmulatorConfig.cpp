@@ -56,17 +56,17 @@ QMap<QString, EmulatorConfig::Config> EmulatorConfig::getEmulatorConfigs() {
   // Configuration pour la PS1 (DuckStation)
   Config swanstationConfig;
   swanstationConfig.emulatorName = "swanstation";
-  swanstationConfig.romsPath = ROMS_DIR + "swan/roms/";
+  swanstationConfig.romsPath = ROMS_DIR + "swanstation/roms/";
   swanstationConfig.extensions << "*.bin" << "*.cue" << "*.iso" << "*.img"
                                << "*.zip";
   configs.insert("swanstation", swanstationConfig);
 
   // Configuration pour la PS2 (PCSX2)
-  Config LRPS2Config;
-  LRPS2Config.emulatorName = "LRPS2";
-  LRPS2Config.romsPath = ROMS_DIR + "LRPS2/roms/";
-  LRPS2Config.extensions << "*.iso" << "*.bin" << "*.zip";
-  configs.insert("LRPS2", LRPS2Config);
+  Config lrps2Config;
+  lrps2Config.emulatorName = "lrps2";
+  lrps2Config.romsPath = ROMS_DIR + "lrps2/roms/";
+  lrps2Config.extensions << "*.iso" << "*.bin" << "*.zip";
+  configs.insert("lrps2", lrps2Config);
 
   // Configuration pour la PS3 (RPCS3)
   Config rpcs3Config;
@@ -82,12 +82,12 @@ QMap<QString, EmulatorConfig::Config> EmulatorConfig::getEmulatorConfigs() {
   ppssppConfig.extensions << "*.iso" << "*.cso" << "*.zip";
   configs.insert("ppsspp", ppssppConfig);
 
-  // Configuration pour la Switch (Yuzu)
-  Config RyujinxConfig;
-  RyujinxConfig.emulatorName = "Ryujinx";
-  RyujinxConfig.romsPath = ROMS_DIR + "Ryujinx/roms/";
-  RyujinxConfig.extensions << "*.nsp" << "*.xci" << "*.zip";
-  configs.insert("Ryujinx", RyujinxConfig);
+  // Configuration pour la Switch (citon)
+  Config citronConfig;
+  citronConfig.emulatorName = "citron";
+  citronConfig.romsPath = ROMS_DIR + "citron/roms/";
+  citronConfig.extensions << "*.nsp" << "*.xci" << "*.zip";
+  configs.insert("citron", citronConfig);
 
   return configs;
 }
