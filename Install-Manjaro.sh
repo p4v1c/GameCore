@@ -132,6 +132,7 @@ sudo mkdir -p "$GAMECORE_PATH/emu/"
 sudo chown -R "$USER_NAME:$USER_NAME" "$GAMECORE_PATH/emu/"
 printf "%s\n%s\n" "$SMB_PASS" "$SMB_PASS" | sudo smbpasswd -s -a "$USER_NAME"
 sudo systemctl restart smb.service nmb.service || true
+sudo systemctl enable smb.service nmb.service || true
 
 # === SSH ===
 msg "Activation SSH"
