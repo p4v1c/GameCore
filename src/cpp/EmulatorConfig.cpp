@@ -40,11 +40,11 @@ QMap<QString, EmulatorConfig::Config> EmulatorConfig::getEmulatorConfigs() {
   configs.insert("melonds", melondsConfig);
 
   // Configuration pour la 3DS (azahar)
-  Config citraConfig;
-  citraConfig.emulatorName = "citra";
-  citraConfig.romsPath = ROMS_DIR + "citra/roms/";
-  citraConfig.extensions << "*.3ds" << "*.3dsx" << "*.cci" << "*.zip";
-  configs.insert("citra", citraConfig);
+  Config azaharConfig;
+  azaharConfig.emulatorName = "azahar";
+  azaharConfig.romsPath = ROMS_DIR + "azahar/roms/";
+  azaharConfig.extensions << "*.3ds" << "*.3dsx" << "*.cci" << "*.zip";
+  configs.insert("azahar", azaharConfig);
 
   // Configuration pour la GBA (mGBA)
   Config mgbaConfig;
