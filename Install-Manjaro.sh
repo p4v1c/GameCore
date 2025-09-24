@@ -84,6 +84,7 @@ if ! flatpak remote-list | grep -q flathub; then
   sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 fi
 flatpak install -y flathub org.libretro.RetroArch || true
+flatpak install -y flathub org.azahar_emu.Azahar || true
 
 # === Compilation GameCore ===
 msg "Compilation GameCore"
