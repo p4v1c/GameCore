@@ -1,3 +1,6 @@
+
+Important connect ta mannette avant de d'installer GameCore 
+
 # GameCore
 
 - Install Citron :
