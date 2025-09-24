@@ -2,7 +2,7 @@
     "citra": {
         "name": "Citra",
         "path": "flatpak",
-        "args": "run org.libretro.RetroArch  -L ../lib/citra2018_libretro.so --fullscreen"
+        "args": "run org.azahar_emu.Azahar  -f"
     },
     "bsnes": {
         "name": "BSNES",
