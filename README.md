@@ -7,13 +7,8 @@
 
 ====================
 
-- Install RPCS3 :
 
-[https://rpcs3.net/download](https://rpcs3.net/download)
-
-====================
-
-Mettre les appimage dans le dossier et renommer Ryujinx par citron.
+Mettre l'appimage dans le dossier lib
 Désactiver la veille .
 
 ## Automatic Installation
@@ -33,8 +28,8 @@ SwanStation → PS1 : un BIOS SCPH officiel est recommandé pour compatibilité 
 melonDS → pour Nintendo DS, un BIOS + firmware est nécessaire pour 100 % des jeux.
 Mupen64Plus → N64 : certains plugins demandent le BIOS, mais beaucoup de jeux fonctionnent sans.
 LRPS2 → PS2 : BIOS PS2 obligatoire pour lancer les jeux.
-Ryujinx
-RPCS3
+Citron
+RPCS3BIOS PS3 obligatoire pour lancer les jeux.
 
 - Doc For the firmwares :
 
