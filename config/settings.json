@@ -1,6 +1,6 @@
 {
-    "citra": {
-        "name": "Citra",
+    "azahar": {
+        "name": "azahar",
         "path": "flatpak",
         "args": "run org.azahar_emu.Azahar  -f"
     },
