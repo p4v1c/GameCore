@@ -34,14 +34,7 @@ void EmulatorManager::scanEmulators(const QString &directory) {
         emu.icon = QPixmap(128, 128);
         emu.icon.fill(Qt::gray);
       }
-    } else if (lower.contains("bsnes")) {
-      emu.platform = "SNES";
-      if (!emu.icon.load("../assets/logos/snes.png")) {
-        qDebug() << "Impossible de charger snes.png";
-        emu.icon = QPixmap(128, 128);
-        emu.icon.fill(Qt::gray);
-      }
-    } else if (lower.contains("lrps2")) {
+    } else if (lower.contains("pcsx2")) {
       emu.platform = "PS2";
       if (!emu.icon.load("../assets/logos/ps2.png")) {
         qDebug() << "Impossible de charger ps2.png";
@@ -55,7 +48,7 @@ void EmulatorManager::scanEmulators(const QString &directory) {
         emu.icon = QPixmap(128, 128);
         emu.icon.fill(Qt::gray);
       }
-    } else if (lower.contains("swanstation")) {
+    } else if (lower.contains("duckstation")) {
       emu.platform = "PS1";
       if (!emu.icon.load("../assets/logos/ps1.png")) {
         qDebug() << "Impossible de charger ps1.png";
@@ -90,17 +83,10 @@ void EmulatorManager::scanEmulators(const QString &directory) {
         emu.icon = QPixmap(128, 128);
         emu.icon.fill(Qt::gray);
       }
-    } else if (lower.contains("mupen64plus")) {
+    } else if (lower.contains("gopher64")) {
       emu.platform = "N64";
       if (!emu.icon.load("../assets/logos/n64.png")) {
         qDebug() << "Impossible de charger n64.png";
-        emu.icon = QPixmap(128, 128);
-        emu.icon.fill(Qt::gray);
-      }
-    } else if (lower.contains("fceux")) {
-      emu.platform = "NES";
-      if (!emu.icon.load("../assets/logos/nes.png")) {
-        qDebug() << "Impossible de charger nes.png";
         emu.icon = QPixmap(128, 128);
         emu.icon.fill(Qt::gray);
       }

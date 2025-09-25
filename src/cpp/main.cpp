@@ -51,9 +51,7 @@ int main(int argc, char *argv[]) {
   statusBar->setStyleSheet(
       "color: white; font-size: 16px; background: transparent; padding: 5px;");
   statusBar->setSizeGripEnabled(false);
-  statusBar->showMessage("En attente de manette...", 0);
 
-  // Widget permanent à droite pour IP + Disk
   QLabel *sysInfoLabel = new QLabel(statusBar);
   sysInfoLabel->setStyleSheet("color: lightgray; font-size: 16px;");
   QString ip = runCommand("hostname -I | awk '{print $1}'");
@@ -64,6 +62,24 @@ int main(int argc, char *argv[]) {
   // ----- MANAGER DE MANETTE -----
   ControllerManager controllerManager;
   controllerManager.initialize();
+
+  bool controllerFound = false;
+  for (int i = 0; i < SDL_NumJoysticks(); i++) {
+    if (SDL_IsGameController(i)) {
+      SDL_GameController *ctrl = SDL_GameControllerOpen(i);
+      if (ctrl) {
+        QString name = QString::fromUtf8(SDL_GameControllerName(ctrl));
+        statusBar->showMessage(QString("Manette '%1' détectée !").arg(name),
+                               5000);
+        SDL_GameControllerClose(ctrl);
+        controllerFound = true;
+        break;
+      }
+    }
+  }
+  if (!controllerFound) {
+    statusBar->showMessage("En attente de manette...", 0);
+  }
 
   QObject::connect(&controllerManager, &ControllerManager::controllerConnected,
                    statusBar, [statusBar](const QString &name) {
@@ -88,6 +104,7 @@ int main(int argc, char *argv[]) {
                      QString(COLOR_CORE) +
                      "; font-size:80px; font-weight:bold;'>Core</span>";
   gameCoreLabel->setText(htmlText);
+
   QGraphicsOpacityEffect *opacityEffect =
       new QGraphicsOpacityEffect(gameCoreLabel);
   gameCoreLabel->setGraphicsEffect(opacityEffect);
@@ -108,7 +125,6 @@ int main(int argc, char *argv[]) {
   bool isGameRunning = false;
   QProcess *currentProcess = nullptr;
 
-  // ----- FADE-OUT SPLASH PUIS CAROUSEL + GAME LIST -----
   QTimer::singleShot(SPLASH_DISPLAY_DURATION, [opacityEffect, &mainLayout,
                                                &window, &controllerManager,
                                                statusBar, &isGameRunning,
@@ -136,16 +152,13 @@ int main(int argc, char *argv[]) {
       QVBoxLayout *centralLayout = new QVBoxLayout(centralWidget);
       centralLayout->setContentsMargins(0, 0, 0, 0);
 
-      // Création de la barre d'en-tête pour l'heure
       QHBoxLayout *headerLayout = new QHBoxLayout();
       QLabel *clockLabel = new QLabel(centralWidget);
       clockLabel->setStyleSheet("color: white; font-size: 24px; padding-left: "
                                 "20px; padding-top: 10px;");
       clockLabel->setAlignment(Qt::AlignLeft | Qt::AlignTop);
-
       headerLayout->addWidget(clockLabel);
       headerLayout->addStretch();
-
       centralLayout->addLayout(headerLayout);
       centralLayout->addStretch();
 
@@ -163,7 +176,6 @@ int main(int argc, char *argv[]) {
                                    QSizePolicy::Expanding);
 
       centralLayout->addWidget(stackedWidget, 0, Qt::AlignCenter);
-
       centralLayout->addStretch();
 
       QObject::connect(
@@ -185,28 +197,20 @@ int main(int argc, char *argv[]) {
           [&window, &isGameRunning, &currentProcess,
            statusBar](const QString &emulatorPath, const QString &emulatorArgs,
                       const QString &gamePath) {
-            qDebug() << "Signal launchGame reçu.";
             statusBar->showMessage("Lancement du jeu...", 5000);
             isGameRunning = true;
             currentProcess = new QProcess();
             QStringList argsList;
             argsList << emulatorArgs.split(" ", Qt::SkipEmptyParts);
             argsList << gamePath;
-            qDebug() << "Lancement du jeu avec la commande:" << emulatorPath
-                     << argsList;
             currentProcess->start(emulatorPath, argsList);
 
-            QTimer::singleShot(5000, [&window]() {
-              qDebug() << "Délai de 5 secondes écoulé. Masquage de la fenêtre.";
-              window.hide();
-            });
+            QTimer::singleShot(5000, [&window]() { window.hide(); });
 
             QObject::connect(
                 currentProcess,
                 QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
                 [&window, &isGameRunning, &currentProcess](int exitCode) {
-                  qDebug() << "Le processus principal a terminé avec le code:"
-                           << exitCode;
                   isGameRunning = false;
                   window.showFullScreen();
                   window.setFocus();
@@ -215,24 +219,79 @@ int main(int argc, char *argv[]) {
                 });
           });
 
-      // Nouveau : Ajout du menu d'alimentation et de l'effet de flou
       PowerMenuWidget *powerMenu = new PowerMenuWidget(&window);
       powerMenu->hide();
       powerMenu->setParent(&window);
       powerMenu->setGeometry(0, 0, window.width(), window.height());
 
-      // Appliquer l'effet de flou au widget central, pas à la fenêtre entière
       QGraphicsBlurEffect *blurEffect = new QGraphicsBlurEffect();
       blurEffect->setBlurRadius(0);
       centralWidget->setGraphicsEffect(blurEffect);
 
-      // Nouveau : Connexion des signaux de la manette pour le menu
-      // d'alimentation
       QObject::connect(
           &controllerManager, &ControllerManager::buttonPressed,
           [&window, powerMenu, blurEffect, stackedWidget, &isGameRunning,
            &currentProcess, centralWidget](int button) {
-            // Le bouton Back (ou Guide) ouvre/ferme le menu, et gère le flou
+            // Si jeu en cours : ignorer tous les boutons sauf GUIDE
+            if (isGameRunning && currentProcess) {
+              if (button == SDL_CONTROLLER_BUTTON_GUIDE) {
+                QString emulatorPath = currentProcess->program();
+
+                if (emulatorPath.contains("flatpak", Qt::CaseInsensitive)) {
+                  qDebug() << "L'émulateur est une application Flatpak. "
+                              "Tentative de récupération de l'ID...";
+                  QString flatpakId;
+                  for (const QString &arg : currentProcess->arguments()) {
+                    if (arg.startsWith("org.")) {
+                      flatpakId = arg;
+                      break;
+                    }
+                  }
+
+                  if (!flatpakId.isEmpty()) {
+                    QProcess::startDetached(
+                        "flatpak", QStringList() << "kill" << flatpakId);
+                    qDebug() << "Commande lancée: flatpak kill " << flatpakId;
+                  } else {
+                    qDebug() << "Impossible de trouver l'ID Flatpak dans les "
+                                "arguments. Utilisation de pkill en dernier "
+                                "recours.";
+                    QStringList args = currentProcess->arguments();
+                    if (!args.isEmpty()) {
+                      QFileInfo fileInfo(args.last());
+                      QString romName = fileInfo.fileName();
+                      if (!romName.isEmpty()) {
+                        QProcess::startDetached(
+                            "pkill", QStringList() << "-f" << romName);
+                        qDebug() << "Commande lancée: pkill -f " << romName;
+                      } else {
+                        qDebug() << "Impossible de déterminer le nom de la ROM "
+                                    "pour la terminaison.";
+                      }
+                    }
+                  }
+                } else {
+                  qDebug() << "L'émulateur n'est pas une application Flatpak. "
+                              "Utilisation de 'pkill'.";
+                  QStringList args = currentProcess->arguments();
+                  if (!args.isEmpty()) {
+                    QFileInfo fileInfo(args.last());
+                    QString romName = fileInfo.fileName();
+                    if (!romName.isEmpty()) {
+                      QProcess::startDetached("pkill", QStringList()
+                                                           << "-f" << romName);
+                      qDebug() << "Commande lancée: pkill -f " << romName;
+                    } else {
+                      qDebug() << "Impossible de déterminer le nom de la ROM "
+                                  "pour la terminaison.";
+                    }
+                  }
+                }
+              }
+              return;
+            }
+
+            // Gestion PowerMenu
             if (button == SDL_CONTROLLER_BUTTON_BACK ||
                 button == SDL_CONTROLLER_BUTTON_GUIDE) {
               if (powerMenu->isHidden()) {
@@ -253,11 +312,7 @@ int main(int argc, char *argv[]) {
                                  [powerMenu]() { powerMenu->hide(); });
                 anim->start();
               }
-            }
-            // Si le menu est visible, on passe l'événement au menu pour le
-            // gérer
-            else if (!powerMenu->isHidden()) {
-              // C'est ici que le bouton 'O' est géré pour cacher le menu
+            } else if (!powerMenu->isHidden()) {
               if (button == SDL_CONTROLLER_BUTTON_B) {
                 QPropertyAnimation *anim =
                     new QPropertyAnimation(blurEffect, "blurRadius");
@@ -270,18 +325,7 @@ int main(int argc, char *argv[]) {
               } else {
                 powerMenu->handleControllerButton(button);
               }
-            }
-            // Si un jeu est en cours, le bouton Guide sert de raccourci pour le
-            // quitter
-            else if (isGameRunning && currentProcess) {
-              if (button == SDL_CONTROLLER_BUTTON_GUIDE) {
-                qDebug() << "Bouton Guide pressé pour quitter le jeu.";
-                currentProcess->terminate();
-              }
-            }
-            // Sinon, on transmet l'événement au widget de la pile (Carousel ou
-            // GameListWidget)
-            else {
+            } else {
               if (QWidget *currentWidget = stackedWidget->currentWidget()) {
                 if (Carousel *carousel =
                         qobject_cast<Carousel *>(currentWidget)) {
@@ -314,7 +358,6 @@ int main(int argc, char *argv[]) {
             }
           });
 
-      // Reconnexion de l'horloge
       QTimer *clockTimer = new QTimer(centralWidget);
       QObject::connect(clockTimer, &QTimer::timeout, [clockLabel]() {
         clockLabel->setText(QDateTime::currentDateTime().toString("HH:mm:ss"));

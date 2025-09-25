@@ -4,57 +4,47 @@
         "path": "flatpak",
         "args": "run org.azahar_emu.Azahar  -f"
     },
-    "bsnes": {
-        "name": "BSNES",
-        "path": "flatpak",
-        "args": "run org.libretro.RetroArch  -L ../lib/bsnes_libretro.so --fullscreen"
-    },
     "dolphin": {
         "name": "Dolphin",
         "path": "flatpak",
-        "args": "run org.libretro.RetroArch  -L ../lib/dolphin_libretro.so --fullscreen"
+        "args": "run org.DolphinEmu.dolphin-emu -f"
     },
-    "swanstation": {
-        "name": "SwanStation",
+    "duckstation": {
+        "name": "duckstation",
         "path": "flatpak",
-        "args": "run org.libretro.RetroArch  -L ../lib/swanstation_libretro.so --fullscreen"
-    },
-    "fceux": {
-        "name": "FCEUX",
-        "path": "flatpak",
-        "args": "run org.libretro.RetroArch  -L ../lib/fceumm_libretro.so --fullscreen"
+        "args": "run org.duckstation.DuckStation -f"
     },
     "melonds": {
         "name": "melonDS",
         "path": "flatpak",
-        "args": "run org.libretro.RetroArch  -L ../lib/melonds_libretro.so --fullscreen"
+        "args": "run net.kuribo64.melonDS -f"
     },
     "mgba": {
         "name": "mGBA",
         "path": "flatpak",
-        "args": "run org.libretro.RetroArch  -L ../lib/mgba_libretro.so --fullscreen"
+        "args": "flatpak run io.mgba.mGBA -f"
     },
-    "mupen64plus": {
-        "name": "Mupen64Plus",
+    "gopher64": {
+        "name": "gopher64",
         "path": "flatpak",
-        "args": "run org.libretro.RetroArch  -L ../lib/mupen64plus_next_libretro.so --fullscreen"
+        "args": "run --filesystem=host:ro io.github.gopher64.gopher64 -f"
     },
-    "LRPS2": {
-        "name": "LRPS2",
+    "pcsx2": {
+        "name": "pcsx2",
         "path": "flatpak",
-        "args": "run org.libretro.RetroArch  -L ../lib/pcsx2_libretro.so --fullscreen"
+        "args": "run net.pcsx2.PCSX2 -f"
     },
     "ppsspp": {
         "name": "PPSSPP",
         "path": "flatpak",
-        "args": "run org.libretro.RetroArch  -L ../lib/ppsspp_libretro.so --fullscreen"
+        "args": "run org.ppsspp.PPSSPP -f"
     },
     "rpcs3": {
         "name": "RPCS3",
         "path": "flatpak",
         "args": "run net.rpcs3.RPCS3 -f"
     },
-    "Ryujinx ": {
+    "citron": {
         "name": "citron",
         "path": "../lib/citron.AppImage",
         "args": "--fullscreen"

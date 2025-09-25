@@ -105,10 +105,10 @@ void PowerMenuWidget::handleControllerAxis(int axis, int value) {
 
 void PowerMenuWidget::onShutdownSelected() {
   qDebug() << "Simulation: Arrêt du système...";
-  QProcess::startDetached("shutdown", QStringList() << "now");
+  // QProcess::startDetached("shutdown", QStringList() << "now");
 }
 
 void PowerMenuWidget::onRestartSelected() {
   qDebug() << "Simulation: Redémarrage du système...";
-  QProcess::startDetached("reboot", QStringList());
+  // QProcess::startDetached("reboot", QStringList());
 }

@@ -83,9 +83,16 @@ msg "Installation RetroArch via Flatpak"
 if ! flatpak remote-list | grep -q flathub; then
   sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 fi
-flatpak install -y flathub org.libretro.RetroArch || true
-flatpak install -y flathub org.azahar_emu.Azahar || true
-flatpak install -y flathub net.rpcs3.RPCS3 || true
+
+flatpak install -y flathub org.azahar_emu.Azahar
+flatpak install -y flathub net.rpcs3.RPCS3
+flatpak install -y flathub net.pcsx2.PCSX2
+flatpak install -y flathub org.DolphinEmu.dolphin-emu
+flatpak install -y flathub org.duckstation.DuckStation
+flatpak install -y flathub net.kuribo64.melonDS
+flatpak install -y flathub io.github.gopher64.gopher64
+flatpak install -y flathub io.mgba.mGBA
+flatpak install -y flathub org.ppsspp.PPSSPP
 
 # === Compilation GameCore ===
 msg "Compilation GameCore"

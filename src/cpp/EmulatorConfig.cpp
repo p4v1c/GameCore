@@ -4,32 +4,19 @@
 QMap<QString, EmulatorConfig::Config> EmulatorConfig::getEmulatorConfigs() {
   QMap<QString, Config> configs;
 
-  // Configuration pour le NES (FCEUX)
-  Config fceuxConfig;
-  fceuxConfig.emulatorName = "fceux";
-  fceuxConfig.romsPath = ROMS_DIR + "fceux/roms/";
-  fceuxConfig.extensions << "*.nes" << "*.zip";
-  configs.insert("fceux", fceuxConfig);
-
-  // Configuration pour la SNES (BSNES)
-  Config bsnesConfig;
-  bsnesConfig.emulatorName = "bsnes";
-  bsnesConfig.romsPath = ROMS_DIR + "bsnes/roms/";
-  bsnesConfig.extensions << "*.sfc" << "*.smc" << "*.zip";
-  configs.insert("bsnes", bsnesConfig);
-
   // Configuration pour la N64 (Mupen64Plus)
-  Config mupenConfig;
-  mupenConfig.emulatorName = "mupen64plus";
-  mupenConfig.romsPath = ROMS_DIR + "mupen64plus/roms/";
-  mupenConfig.extensions << "*.n64" << "*.z64" << "*.v64" << "*.zip";
-  configs.insert("mupen64plus", mupenConfig);
+  Config gopher64Config;
+  gopher64Config.emulatorName = "gopher64";
+  gopher64Config.romsPath = ROMS_DIR + "gopher64/roms/";
+  gopher64Config.extensions << "*.n64" << "*.z64" << "*.v64" << "*.zip";
+  configs.insert("gopher64", gopher64Config);
 
   // Configuration pour le GameCube/Wii (Dolphin)
   Config dolphinConfig;
   dolphinConfig.emulatorName = "dolphin";
   dolphinConfig.romsPath = ROMS_DIR + "dolphin/roms/";
-  dolphinConfig.extensions << "*.iso" << "*.gcm" << "*.wii" << "*.zip";
+  dolphinConfig.extensions << "*.iso" << "*.gcm" << "*.wii" << "*.zip"
+                           << "*.rvz";
   configs.insert("dolphin", dolphinConfig);
 
   // Configuration pour la DS (MelonDS)
@@ -54,19 +41,19 @@ QMap<QString, EmulatorConfig::Config> EmulatorConfig::getEmulatorConfigs() {
   configs.insert("mgba", mgbaConfig);
 
   // Configuration pour la PS1 (DuckStation)
-  Config swanstationConfig;
-  swanstationConfig.emulatorName = "swanstation";
-  swanstationConfig.romsPath = ROMS_DIR + "swanstation/roms/";
-  swanstationConfig.extensions << "*.bin" << "*.cue" << "*.iso" << "*.img"
+  Config duckstationConfig;
+  duckstationConfig.emulatorName = "duckstation";
+  duckstationConfig.romsPath = ROMS_DIR + "duckstation/roms/";
+  duckstationConfig.extensions << "*.bin" << "*.cue" << "*.iso" << "*.img"
                                << "*.zip";
-  configs.insert("swanstation", swanstationConfig);
+  configs.insert("duckstation", duckstationConfig);
 
   // Configuration pour la PS2 (PCSX2)
-  Config lrps2Config;
-  lrps2Config.emulatorName = "lrps2";
-  lrps2Config.romsPath = ROMS_DIR + "lrps2/roms/";
-  lrps2Config.extensions << "*.iso" << "*.bin" << "*.zip";
-  configs.insert("lrps2", lrps2Config);
+  Config pcsx2Config;
+  pcsx2Config.emulatorName = "pcsx2";
+  pcsx2Config.romsPath = ROMS_DIR + "pcsx2/roms/";
+  pcsx2Config.extensions << "*.iso" << "*.bin" << "*.zip";
+  configs.insert("pcsx2", pcsx2Config);
 
   // Configuration pour la PS3 (RPCS3)
   Config rpcs3Config;
