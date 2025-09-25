@@ -105,6 +105,23 @@ curl -L --progress-bar \
 
 sudo chmod +x "$GAMECORE_PATH/lib/citron.AppImage"
 
+# === DuckStation Emulator ===
+msg "Téléchargement et installation de DuckStation"
+sudo -u "$USER_NAME" mkdir -p "$GAMECORE_PATH/lib"
+curl -L --progress-bar \
+  -o "$GAMECORE_PATH/lib/duckstation.AppImage" \
+  "https://github.com/stenzek/duckstation/releases/download/latest/DuckStation-x64.AppImage"
+
+sudo chmod +x "$GAMECORE_PATH/lib/duckstation.AppImage"
+
+# === PCSX2 Emulator ===
+msg "Téléchargement et installation de PCSX2"
+sudo -u "$USER_NAME" mkdir -p "$GAMECORE_PATH/lib"
+curl -L --progress-bar \
+  -o "$GAMECORE_PATH/lib/pcsx2.AppImage" \
+  "https://github.com/PCSX2/pcsx2/releases/download/v2.4.0/pcsx2-v2.4.0-linux-appimage-x64-Qt.AppImage"
+
+sudo chmod +x "$GAMECORE_PATH/lib/pcsx2.AppImage"
 
 # === Compilation GameCore ===
 msg "Compilation GameCore"
