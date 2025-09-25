@@ -37,7 +37,7 @@ QMap<QString, EmulatorConfig::Config> EmulatorConfig::getEmulatorConfigs() {
   Config mgbaConfig;
   mgbaConfig.emulatorName = "mgba";
   mgbaConfig.romsPath = ROMS_DIR + "mgba/roms/";
-  mgbaConfig.extensions << "*.gba" << "*.zip";
+  mgbaConfig.extensions << "*.gba" << "*.zip"<<"*.gbc"<<"*.gb";
   configs.insert("mgba", mgbaConfig);
 
   // Configuration pour la PS1 (DuckStation)
