@@ -242,7 +242,8 @@ int main(int argc, char *argv[]) {
                               "Tentative de récupération de l'ID...";
                   QString flatpakId;
                   for (const QString &arg : currentProcess->arguments()) {
-                    if (arg.startsWith("org.")) {
+                    if (arg.startsWith("org.") || arg.startsWith("io.") ||
+                    arg.startsWith("net.") || arg.startsWith("info.")) {
                       flatpakId = arg;
                       break;
                     }
