@@ -1,39 +1,101 @@
+# 🎮 GameCore : Instructions d'Installation et d'Utilisation
 
-Important connect ta mannette avant de d'installer GameCore 
+Ce guide vous aidera à configurer et à optimiser **GameCore** sur votre système.
+Suivez les étapes ci-dessous pour une expérience de jeu fluide.
 
-# GameCore
+---
 
-- Install Citron :
+## 📝 Prérequis du Système
 
-[https://git.citron-emu.org/citron/emulator/-/releases
-](https://git.citron-emu.org/citron/emulator/-/releases)
+Avant de lancer l'installation, assurez-vous que votre système est configuré pour une utilisation optimale :
 
-====================
+- **Désactiver la barre des tâches** : Pour une expérience plein écran immersive.
+- **Désactiver la mise en veille automatique** : Pour éviter les interruptions pendant vos sessions de jeu.
+- **Mettre à jour le fond d'écran** : Personnalisez votre environnement de bureau.
+- **Connecter la manette en Bluetooth** : Assurez-vous que votre manette est jumelée et reconnue par le système avant de lancer l'application.
 
+---
 
-Mettre l'appimage dans le dossier lib (citron.AppImage)
-Désactiver la veille .
+## 🚀 Installation Automatique
 
-## Automatic Installation
-```sh
-chmod +x install.sh
-./install
+Le script `Manjaroinstall.sh` simplifie le processus d'installation pour les systèmes **Manjaro**.
+
+```bash
+chmod +x Manjaroinstall.sh
+./Manjaroinstall.sh
 ```
-⚠️ Avant de Redémarrer
-
-Téléchager les firmwares et les installer sur les emulateurs ayant besoin .
 
 
-⚠️ BIOS / firmware recommandé ou obligatoire
+## ⚠️ Étapes Cruciales avant le Redémarrage
 
-Dolphin → pour GameCube, souvent ok sans BIOS, mais pour Wii et certaines fonctionnalités (Wii NAND, IOS) il faut le dump officiel.
-SwanStation → PS1 : un BIOS SCPH officiel est recommandé pour compatibilité maximale.
-melonDS → pour Nintendo DS, un BIOS + firmware est nécessaire pour 100 % des jeux.
-Mupen64Plus → N64 : certains plugins demandent le BIOS, mais beaucoup de jeux fonctionnent sans.
-LRPS2 → PS2 : BIOS PS2 obligatoire pour lancer les jeux.
-Citron
-RPCS3BIOS PS3 obligatoire pour lancer les jeux.
+Certaines étapes manuelles sont nécessaires pour que les émulateurs fonctionnent correctement.
+Effectuez-les **impérativement avant de redémarrer votre machine** :
 
-- Doc For the firmwares :
+---
 
-http://emulation.gametechwiki.com/index.php/Emulator_Files
+### 🔧 Firmwares et BIOS des émulateurs
+Téléchargez les **firmwares** (BIOS, clés, etc.) requis et placez-les dans les dossiers correspondants de chaque émulateur.
+C'est **indispensable** pour la compatibilité avec un grand nombre de jeux.
+
+---
+
+### 🎮 Configuration des jeux lourds (Citra / Citron)
+Pour des jeux exigeants comme *The Legend of Zelda: Breath of the Wild (BOTW)* ou *Tears of the Kingdom (TOTK)*, il est fortement recommandé de :
+
+- Les lancer une première fois pour générer les **shaders**.
+- Installer des **mods d’optimisation** (comme *nx-optimizer*) afin d’améliorer les performances (ex : augmenter les FPS).
+
+
+## 📂 BIOS et Firmwares Recommandés (ou Obligatoires)
+
+La plupart des émulateurs modernes ne fonctionnent pas sans leurs fichiers système d'origine.
+Voici un récapitulatif des besoins par émulateur :
+
+---
+
+### 🟦 Dolphin (GameCube, Wii)
+- Le BIOS n'est pas toujours requis pour les jeux GameCube.
+- Un **dump officiel de la NAND Wii** est nécessaire pour certaines fonctionnalités et pour l’émulation Wii.
+
+---
+
+### 🟥 DuckStation (PS1)
+- Un **BIOS SCPH officiel** est vivement recommandé pour une compatibilité maximale.
+- Permet également d’éviter les problèmes de performance.
+
+---
+
+### 🟨 melonDS (DS, DSi)
+- Un **BIOS et un firmware** sont obligatoires pour garantir que 100% des jeux se lancent sans problème.
+- Pour la **DSi**, un **dump de la NAND** est également requis.
+
+---
+
+### 🟩 gopher56 (N64)
+- Fonctionne souvent **sans BIOS**.
+- Certains plugins peuvent cependant en exiger un.
+
+---
+
+### 🟪 pscx2 (PS2)
+- Un **BIOS PS2** est obligatoire pour démarrer les jeux.
+
+---
+
+### 🟧 Citron (3DS)
+- Nécessite une **clé (prod.keys)** et un **firmware** pour décrypter et lancer les jeux.
+
+---
+
+### 🟦 RPCS3 (PS3)
+- Un **BIOS PS3** est obligatoire pour lancer les jeux.
+
+---
+
+### 🟫 Cemu (Wii U)
+- Nécessite une **clé de jeu** pour lancer les fichiers `.wux` et autres formats chiffrés.
+
+---
+
+📖 Pour obtenir ces fichiers, consultez la documentation officielle :
+👉 [Emulator Files - gametechwiki](http://emulation.gametechwiki.com/index.php/Emulator_Files)

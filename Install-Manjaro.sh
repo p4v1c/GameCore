@@ -78,7 +78,7 @@ sudo cpupower frequency-set -g performance || true
 sudo systemctl enable --now thermald.service || true
 
 
-# === RetroArch ===
+# === Installation Emulator ===
 msg "Installation RetroArch via Flatpak"
 if ! flatpak remote-list | grep -q flathub; then
   sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
@@ -93,6 +93,18 @@ flatpak install -y flathub net.kuribo64.melonDS
 flatpak install -y flathub io.github.gopher64.gopher64
 flatpak install -y flathub io.mgba.mGBA
 flatpak install -y flathub org.ppsspp.PPSSPP
+flatpak install -y flathub info.cemu.Cemu
+
+
+# === Citron Emulator ===
+msg "Téléchargement et installation de Citron Emulator"
+sudo -u "$USER_NAME" mkdir -p "$GAMECORE_PATH/lib"
+curl -L --progress-bar \
+  -o "$GAMECORE_PATH/lib/citron.AppImage" \
+  "https://git.citron-emu.org/api/v4/projects/1/packages/generic/Citron-Canary/0.7.0/Citron-0.7.0-anylinux-x86_64_v3.AppImage"
+
+sudo chmod +x "$GAMECORE_PATH/lib/citron.AppImage"
+
 
 # === Compilation GameCore ===
 msg "Compilation GameCore"
@@ -154,10 +166,8 @@ echo "Samba configuré (utilisateur : $USER_NAME)."
 echo "SSH activé."
 echo "RetroArch installé via Flatpak."
 echo "Drivers AMD + Vulkan installés."
-
-read -rp "Redémarrer maintenant ? (y/N) " REBOOT
-if [[ "$REBOOT" =~ ^([yY][eE][sS]|[yY])$ ]]; then
-  sudo systemctl reboot
-else
-  echo "➡️ Tu peux redémarrer plus tard avec : sudo systemctl reboot"
-fi
+echo "==========================================="
+echo "Maintenant tu peux installer les firmares pour ds ,3ds , ps1 ,ps2 ,Wii U et ps3"
+echo "==========================================="
+echo "Et ensuite setup les manettes pour chaque emulateurs"
+echo "Ensuite lis de Readme.txt"
