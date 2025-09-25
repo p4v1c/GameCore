@@ -123,6 +123,15 @@ curl -L --progress-bar \
 
 sudo chmod +x "$GAMECORE_PATH/lib/pcsx2.AppImage"
 
+# === RPCS3 Emulator ===
+msg "Téléchargement et installation de RPCS3"
+sudo -u "$USER_NAME" mkdir -p "$GAMECORE_PATH/lib"
+curl -L --progress-bar \
+  -o "$GAMECORE_PATH/lib/rpcs3.AppImage" \
+  "https://github.com/RPCS3/rpcs3-binaries-linux/releases/download/build-359163c44298ef9baac835936fce192337ac560a/rpcs3-v0.0.37-18158-359163c4_linux64.AppImage"
+
+sudo chmod +x "$GAMECORE_PATH/lib/rpcs3.AppImage"
+
 # === Compilation GameCore ===
 msg "Compilation GameCore"
 sudo -u "$USER_NAME" mkdir -p "$GAMECORE_PATH/build"
