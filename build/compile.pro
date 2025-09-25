@@ -16,6 +16,7 @@ SOURCES += ../src/cpp/main.cpp \
            ../src/cpp/ControllerManager.cpp \
            ../src/cpp/Carousel.cpp \
            ../src/cpp/GameListWidget.cpp \
+           ../src/cpp/PowerMenuWidget.cpp \
            ../src/cpp/EmulatorConfig.cpp
 
 # ---------------------
@@ -27,4 +28,5 @@ HEADERS += ../src/headers/Emulator.h \
            ../src/headers/Constants.h \
            ../src/headers/Carousel.h \
            ../src/headers/GameListWidget.h \
+           ../src/headers/PowerMenuWidget.h \
            ../src/headers/EmulatorConfig.h

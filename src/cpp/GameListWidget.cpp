@@ -3,14 +3,14 @@
 #include "../headers/EmulatorConfig.h"
 #include <QDebug>
 #include <QDir>
-#include <QKeyEvent>
-#include <QLabel>
-#include <QVBoxLayout>
-#include <SDL.h>
-#include <QProcess>
+#include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QFile>
+#include <QKeyEvent>
+#include <QLabel>
+#include <QProcess>
+#include <QVBoxLayout>
+#include <SDL.h>
 
 GameListWidget::GameListWidget(QWidget *parent)
     : QWidget(parent), lastAxisValue(0) {
@@ -20,23 +20,22 @@ GameListWidget::GameListWidget(QWidget *parent)
 
   // Initialisation de la QListWidget
   gameList = new QListWidget(this);
-  gameList->setStyleSheet(
-      "QListWidget {"
-      "    background-color: #3C3C3C;"
-      "    color: #E0E0E0;"
-      "    font-size: 24px;"
-      "    border: 2px solid #555555;"
-      "    border-radius: 15px;"
-      "}"
-      "QListWidget::item {"
-      "    background: transparent;"
-      "    padding: 10px;"
-      "}"
-      "QListWidget::item:selected {"
-      "    background-color: #007AFF;"
-      "    color: white;"
-      "    border-radius: 10px;"
-      "}");
+  gameList->setStyleSheet("QListWidget {"
+                          "    background-color: #3C3C3C;"
+                          "    color: #E0E0E0;"
+                          "    font-size: 24px;"
+                          "    border: 2px solid #555555;"
+                          "    border-radius: 15px;"
+                          "}"
+                          "QListWidget::item {"
+                          "    background: transparent;"
+                          "    padding: 10px;"
+                          "}"
+                          "QListWidget::item:selected {"
+                          "    background-color: #007AFF;"
+                          "    color: white;"
+                          "    border-radius: 10px;"
+                          "}");
   gameList->setFocusPolicy(Qt::NoFocus);
   gameList->setFixedWidth(800);
   gameList->setMinimumHeight(400);
@@ -157,32 +156,37 @@ void GameListWidget::handleControllerAxis(int axis, int value) {
 }
 
 void GameListWidget::launchSelectedGame() {
-    if (gameList->currentRow() < 0) return;
-    QString selectedGameName = gameList->currentItem()->text();
+  if (gameList->currentRow() < 0)
+    return;
+  QString selectedGameName = gameList->currentItem()->text();
 
-    QFile file("../config/settings.json");
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "Impossible d'ouvrir le fichier de configuration JSON: ../config/settings.json";
-        return;
-    }
+  QFile file("../config/settings.json");
+  if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    qWarning() << "Impossible d'ouvrir le fichier de configuration JSON: "
+                  "../config/settings.json";
+    return;
+  }
 
-    QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
-    QJsonObject emulatorsConfig = doc.object();
-    file.close();
+  QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
+  QJsonObject emulatorsConfig = doc.object();
+  file.close();
 
-    if (!emulatorsConfig.contains(selectedEmulatorName)) {
-        qWarning() << "Configuration non trouvée pour l'émulateur:" << selectedEmulatorName;
-        return;
-    }
+  if (!emulatorsConfig.contains(selectedEmulatorName)) {
+    qWarning() << "Configuration non trouvée pour l'émulateur:"
+               << selectedEmulatorName;
+    return;
+  }
 
-    QJsonObject emuConfig = emulatorsConfig.value(selectedEmulatorName).toObject();
-    QString emuPath = emuConfig.value("path").toString();
-    QString emuArgs = emuConfig.value("args").toString();
+  QJsonObject emuConfig =
+      emulatorsConfig.value(selectedEmulatorName).toObject();
+  QString emuPath = emuConfig.value("path").toString();
+  QString emuArgs = emuConfig.value("args").toString();
 
-    QMap<QString, EmulatorConfig::Config> configs = EmulatorConfig::getEmulatorConfigs();
-    QString romsPath = configs.value(selectedEmulatorName).romsPath;
-    QString fullGamePath = QDir(romsPath).filePath(selectedGameName);
+  QMap<QString, EmulatorConfig::Config> configs =
+      EmulatorConfig::getEmulatorConfigs();
+  QString romsPath = configs.value(selectedEmulatorName).romsPath;
+  QString fullGamePath = QDir(romsPath).filePath(selectedGameName);
 
-    // FIX : On passe les trois arguments au signal
-    emit launchGame(emuPath, emuArgs, fullGamePath);
+  // FIX : On passe les trois arguments au signal
+  emit launchGame(emuPath, emuArgs, fullGamePath);
 }
