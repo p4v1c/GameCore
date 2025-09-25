@@ -2,6 +2,7 @@
 #include <QDateTime>
 #include <QFile>
 #include <QFileInfo>
+#include <QGraphicsBlurEffect>
 #include <QGraphicsOpacityEffect>
 #include <QHBoxLayout>
 #include <QJsonDocument>
@@ -22,6 +23,7 @@
 #include "../headers/Emulator.h"
 #include "../headers/EmulatorWidget.h"
 #include "../headers/GameListWidget.h"
+#include "../headers/PowerMenuWidget.h"
 
 QString runCommand(const QString &command) {
   QProcess process;
@@ -42,16 +44,14 @@ int main(int argc, char *argv[]) {
   QVBoxLayout *mainLayout = new QVBoxLayout(&window);
   mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->setSpacing(0);
+  window.setLayout(mainLayout);
 
   // ----- STATUS BAR -----
   QStatusBar *statusBar = new QStatusBar(&window);
   statusBar->setStyleSheet(
       "color: white; font-size: 16px; background: transparent; padding: 5px;");
   statusBar->setSizeGripEnabled(false);
-  mainLayout->addWidget(statusBar);
-  statusBar->showMessage("En attente de manette...", 0);
 
-  // Widget permanent à droite pour IP + Disk
   QLabel *sysInfoLabel = new QLabel(statusBar);
   sysInfoLabel->setStyleSheet("color: lightgray; font-size: 16px;");
   QString ip = runCommand("hostname -I | awk '{print $1}'");
@@ -62,6 +62,24 @@ int main(int argc, char *argv[]) {
   // ----- MANAGER DE MANETTE -----
   ControllerManager controllerManager;
   controllerManager.initialize();
+
+  bool controllerFound = false;
+  for (int i = 0; i < SDL_NumJoysticks(); i++) {
+    if (SDL_IsGameController(i)) {
+      SDL_GameController *ctrl = SDL_GameControllerOpen(i);
+      if (ctrl) {
+        QString name = QString::fromUtf8(SDL_GameControllerName(ctrl));
+        statusBar->showMessage(QString("Manette '%1' détectée !").arg(name),
+                               5000);
+        SDL_GameControllerClose(ctrl);
+        controllerFound = true;
+        break;
+      }
+    }
+  }
+  if (!controllerFound) {
+    statusBar->showMessage("En attente de manette...", 0);
+  }
 
   QObject::connect(&controllerManager, &ControllerManager::controllerConnected,
                    statusBar, [statusBar](const QString &name) {
@@ -86,6 +104,7 @@ int main(int argc, char *argv[]) {
                      QString(COLOR_CORE) +
                      "; font-size:80px; font-weight:bold;'>Core</span>";
   gameCoreLabel->setText(htmlText);
+
   QGraphicsOpacityEffect *opacityEffect =
       new QGraphicsOpacityEffect(gameCoreLabel);
   gameCoreLabel->setGraphicsEffect(opacityEffect);
@@ -95,7 +114,6 @@ int main(int argc, char *argv[]) {
   mainLayout->addWidget(gameCoreLabel, 0, Qt::AlignCenter);
   mainLayout->addStretch();
 
-  window.setLayout(mainLayout);
   window.show();
 
   QPropertyAnimation *fadeIn = new QPropertyAnimation(opacityEffect, "opacity");
@@ -107,7 +125,6 @@ int main(int argc, char *argv[]) {
   bool isGameRunning = false;
   QProcess *currentProcess = nullptr;
 
-  // ----- FADE-OUT SPLASH PUIS CAROUSEL + GAME LIST -----
   QTimer::singleShot(SPLASH_DISPLAY_DURATION, [opacityEffect, &mainLayout,
                                                &window, &controllerManager,
                                                statusBar, &isGameRunning,
@@ -140,10 +157,8 @@ int main(int argc, char *argv[]) {
       clockLabel->setStyleSheet("color: white; font-size: 24px; padding-left: "
                                 "20px; padding-top: 10px;");
       clockLabel->setAlignment(Qt::AlignLeft | Qt::AlignTop);
-
       headerLayout->addWidget(clockLabel);
       headerLayout->addStretch();
-
       centralLayout->addLayout(headerLayout);
       centralLayout->addStretch();
 
@@ -161,7 +176,6 @@ int main(int argc, char *argv[]) {
                                    QSizePolicy::Expanding);
 
       centralLayout->addWidget(stackedWidget, 0, Qt::AlignCenter);
-
       centralLayout->addStretch();
 
       QObject::connect(
@@ -183,34 +197,20 @@ int main(int argc, char *argv[]) {
           [&window, &isGameRunning, &currentProcess,
            statusBar](const QString &emulatorPath, const QString &emulatorArgs,
                       const QString &gamePath) {
-            qDebug() << "Signal launchGame reçu.";
-
-            // NOUVEAU: Le jeu est lancé immédiatement
             statusBar->showMessage("Lancement du jeu...", 5000);
             isGameRunning = true;
-
             currentProcess = new QProcess();
-
             QStringList argsList;
             argsList << emulatorArgs.split(" ", Qt::SkipEmptyParts);
             argsList << gamePath;
-
-            qDebug() << "Lancement du jeu avec la commande:" << emulatorPath
-                     << argsList;
             currentProcess->start(emulatorPath, argsList);
 
-            // NOUVEAU: La fenêtre se cache après un délai de 5 secondes
-            QTimer::singleShot(5000, [&window]() {
-              qDebug() << "Délai de 5 secondes écoulé. Masquage de la fenêtre.";
-              window.hide();
-            });
+            QTimer::singleShot(5000, [&window]() { window.hide(); });
 
             QObject::connect(
                 currentProcess,
                 QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
                 [&window, &isGameRunning, &currentProcess](int exitCode) {
-                  qDebug() << "Le processus principal a terminé avec le code:"
-                           << exitCode;
                   isGameRunning = false;
                   window.showFullScreen();
                   window.setFocus();
@@ -219,12 +219,22 @@ int main(int argc, char *argv[]) {
                 });
           });
 
+      PowerMenuWidget *powerMenu = new PowerMenuWidget(&window);
+      powerMenu->hide();
+      powerMenu->setParent(&window);
+      powerMenu->setGeometry(0, 0, window.width(), window.height());
+
+      QGraphicsBlurEffect *blurEffect = new QGraphicsBlurEffect();
+      blurEffect->setBlurRadius(0);
+      centralWidget->setGraphicsEffect(blurEffect);
+
       QObject::connect(
-          &controllerManager, &ControllerManager::buttonPressed, stackedWidget,
-          [stackedWidget, &isGameRunning, &currentProcess](int button) {
-            if (button == SDL_CONTROLLER_BUTTON_GUIDE) {
-              qDebug() << "Bouton Guide pressé.";
-              if (isGameRunning && currentProcess) {
+          &controllerManager, &ControllerManager::buttonPressed,
+          [&window, powerMenu, blurEffect, stackedWidget, &isGameRunning,
+           &currentProcess, centralWidget](int button) {
+            // Si jeu en cours : ignorer tous les boutons sauf GUIDE
+            if (isGameRunning && currentProcess) {
+              if (button == SDL_CONTROLLER_BUTTON_GUIDE) {
                 QString emulatorPath = currentProcess->program();
 
                 if (emulatorPath.contains("flatpak", Qt::CaseInsensitive)) {
@@ -277,36 +287,73 @@ int main(int argc, char *argv[]) {
                     }
                   }
                 }
-              } else {
-                qDebug() << "Aucun jeu n'est en cours, pas de terminaison "
-                            "nécessaire.";
               }
-            }
-            if (isGameRunning)
               return;
-            if (QWidget *currentWidget = stackedWidget->currentWidget()) {
-              if (Carousel *carousel =
-                      qobject_cast<Carousel *>(currentWidget)) {
-                carousel->handleControllerButton(button);
-              } else if (GameListWidget *gameListWidget =
-                             qobject_cast<GameListWidget *>(currentWidget)) {
-                gameListWidget->handleControllerButton(button);
+            }
+
+            // Gestion PowerMenu
+            if (button == SDL_CONTROLLER_BUTTON_BACK ||
+                button == SDL_CONTROLLER_BUTTON_GUIDE) {
+              if (powerMenu->isHidden()) {
+                powerMenu->show();
+                QPropertyAnimation *anim =
+                    new QPropertyAnimation(blurEffect, "blurRadius");
+                anim->setDuration(300);
+                anim->setStartValue(0);
+                anim->setEndValue(30);
+                anim->start();
+              } else {
+                QPropertyAnimation *anim =
+                    new QPropertyAnimation(blurEffect, "blurRadius");
+                anim->setDuration(300);
+                anim->setStartValue(30);
+                anim->setEndValue(0);
+                QObject::connect(anim, &QPropertyAnimation::finished,
+                                 [powerMenu]() { powerMenu->hide(); });
+                anim->start();
+              }
+            } else if (!powerMenu->isHidden()) {
+              if (button == SDL_CONTROLLER_BUTTON_B) {
+                QPropertyAnimation *anim =
+                    new QPropertyAnimation(blurEffect, "blurRadius");
+                anim->setDuration(300);
+                anim->setStartValue(30);
+                anim->setEndValue(0);
+                QObject::connect(anim, &QPropertyAnimation::finished,
+                                 [powerMenu]() { powerMenu->hide(); });
+                anim->start();
+              } else {
+                powerMenu->handleControllerButton(button);
+              }
+            } else {
+              if (QWidget *currentWidget = stackedWidget->currentWidget()) {
+                if (Carousel *carousel =
+                        qobject_cast<Carousel *>(currentWidget)) {
+                  carousel->handleControllerButton(button);
+                } else if (GameListWidget *gameListWidget =
+                               qobject_cast<GameListWidget *>(currentWidget)) {
+                  gameListWidget->handleControllerButton(button);
+                }
               }
             }
           });
 
       QObject::connect(
-          &controllerManager, &ControllerManager::axisMoved, stackedWidget,
-          [stackedWidget, &isGameRunning](int axis, int value) {
+          &controllerManager, &ControllerManager::axisMoved,
+          [powerMenu, stackedWidget, &isGameRunning](int axis, int value) {
             if (isGameRunning)
               return;
-            if (QWidget *currentWidget = stackedWidget->currentWidget()) {
-              if (Carousel *carousel =
-                      qobject_cast<Carousel *>(currentWidget)) {
-                carousel->handleControllerAxis(axis, value);
-              } else if (GameListWidget *gameListWidget =
-                             qobject_cast<GameListWidget *>(currentWidget)) {
-                gameListWidget->handleControllerAxis(axis, value);
+            if (!powerMenu->isHidden()) {
+              powerMenu->handleControllerAxis(axis, value);
+            } else {
+              if (QWidget *currentWidget = stackedWidget->currentWidget()) {
+                if (Carousel *carousel =
+                        qobject_cast<Carousel *>(currentWidget)) {
+                  carousel->handleControllerAxis(axis, value);
+                } else if (GameListWidget *gameListWidget =
+                               qobject_cast<GameListWidget *>(currentWidget)) {
+                  gameListWidget->handleControllerAxis(axis, value);
+                }
               }
             }
           });

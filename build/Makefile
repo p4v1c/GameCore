@@ -58,21 +58,25 @@ SOURCES       = ../src/cpp/main.cpp \
 		../src/cpp/ControllerManager.cpp \
 		../src/cpp/Carousel.cpp \
 		../src/cpp/GameListWidget.cpp \
+		../src/cpp/PowerMenuWidget.cpp \
 		../src/cpp/EmulatorConfig.cpp moc_EmulatorWidget.cpp \
 		moc_ControllerManager.cpp \
 		moc_Carousel.cpp \
-		moc_GameListWidget.cpp
+		moc_GameListWidget.cpp \
+		moc_PowerMenuWidget.cpp
 OBJECTS       = main.o \
 		Emulator.o \
 		EmulatorWidget.o \
 		ControllerManager.o \
 		Carousel.o \
 		GameListWidget.o \
+		PowerMenuWidget.o \
 		EmulatorConfig.o \
 		moc_EmulatorWidget.o \
 		moc_ControllerManager.o \
 		moc_Carousel.o \
-		moc_GameListWidget.o
+		moc_GameListWidget.o \
+		moc_PowerMenuWidget.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/linux.conf \
@@ -160,12 +164,14 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		../src/headers/Constants.h \
 		../src/headers/Carousel.h \
 		../src/headers/GameListWidget.h \
+		../src/headers/PowerMenuWidget.h \
 		../src/headers/EmulatorConfig.h ../src/cpp/main.cpp \
 		../src/cpp/Emulator.cpp \
 		../src/cpp/EmulatorWidget.cpp \
 		../src/cpp/ControllerManager.cpp \
 		../src/cpp/Carousel.cpp \
 		../src/cpp/GameListWidget.cpp \
+		../src/cpp/PowerMenuWidget.cpp \
 		../src/cpp/EmulatorConfig.cpp
 QMAKE_TARGET  = GameCore
 DESTDIR       = 
@@ -358,8 +364,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../src/headers/Emulator.h ../src/headers/EmulatorWidget.h ../src/headers/ControllerManager.h ../src/headers/Constants.h ../src/headers/Carousel.h ../src/headers/GameListWidget.h ../src/headers/EmulatorConfig.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../src/cpp/main.cpp ../src/cpp/Emulator.cpp ../src/cpp/EmulatorWidget.cpp ../src/cpp/ControllerManager.cpp ../src/cpp/Carousel.cpp ../src/cpp/GameListWidget.cpp ../src/cpp/EmulatorConfig.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../src/headers/Emulator.h ../src/headers/EmulatorWidget.h ../src/headers/ControllerManager.h ../src/headers/Constants.h ../src/headers/Carousel.h ../src/headers/GameListWidget.h ../src/headers/PowerMenuWidget.h ../src/headers/EmulatorConfig.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../src/cpp/main.cpp ../src/cpp/Emulator.cpp ../src/cpp/EmulatorWidget.cpp ../src/cpp/ControllerManager.cpp ../src/cpp/Carousel.cpp ../src/cpp/GameListWidget.cpp ../src/cpp/PowerMenuWidget.cpp ../src/cpp/EmulatorConfig.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -391,9 +397,9 @@ compiler_moc_predefs_clean:
 moc_predefs.h: /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 	g++ -pipe -O2 -std=gnu++1z -Wall -Wextra -dM -E -o moc_predefs.h /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: moc_EmulatorWidget.cpp moc_ControllerManager.cpp moc_Carousel.cpp moc_GameListWidget.cpp
+compiler_moc_header_make_all: moc_EmulatorWidget.cpp moc_ControllerManager.cpp moc_Carousel.cpp moc_GameListWidget.cpp moc_PowerMenuWidget.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_EmulatorWidget.cpp moc_ControllerManager.cpp moc_Carousel.cpp moc_GameListWidget.cpp
+	-$(DEL_FILE) moc_EmulatorWidget.cpp moc_ControllerManager.cpp moc_Carousel.cpp moc_GameListWidget.cpp moc_PowerMenuWidget.cpp
 moc_EmulatorWidget.cpp: ../src/headers/EmulatorWidget.h \
 		../src/headers/Emulator.h \
 		moc_predefs.h \
@@ -419,6 +425,11 @@ moc_GameListWidget.cpp: ../src/headers/GameListWidget.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/pavic/Desktop/workspace/GameCore/build/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/pavic/Desktop/workspace/GameCore/build -I/usr/include/SDL2 -I/home/pavic/Desktop/workspace/GameCore/headers -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/12 -I/usr/include/x86_64-linux-gnu/c++/12 -I/usr/include/c++/12/backward -I/usr/lib/gcc/x86_64-linux-gnu/12/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../src/headers/GameListWidget.h -o moc_GameListWidget.cpp
 
+moc_PowerMenuWidget.cpp: ../src/headers/PowerMenuWidget.h \
+		moc_predefs.h \
+		/usr/lib/qt5/bin/moc
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/pavic/Desktop/workspace/GameCore/build/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/pavic/Desktop/workspace/GameCore/build -I/usr/include/SDL2 -I/home/pavic/Desktop/workspace/GameCore/headers -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/12 -I/usr/include/x86_64-linux-gnu/c++/12 -I/usr/include/c++/12/backward -I/usr/lib/gcc/x86_64-linux-gnu/12/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../src/headers/PowerMenuWidget.h -o moc_PowerMenuWidget.cpp
+
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
 compiler_moc_source_make_all:
@@ -439,7 +450,9 @@ main.o: ../src/cpp/main.cpp ../src/headers/Carousel.h \
 		../src/headers/ControllerManager.h \
 		../src/headers/EmulatorWidget.h \
 		../src/headers/Emulator.h \
-		../src/headers/Constants.h
+		../src/headers/Constants.h \
+		../src/headers/GameListWidget.h \
+		../src/headers/PowerMenuWidget.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../src/cpp/main.cpp
 
 Emulator.o: ../src/cpp/Emulator.cpp ../src/headers/Emulator.h
@@ -460,9 +473,12 @@ Carousel.o: ../src/cpp/Carousel.cpp ../src/headers/Carousel.h \
 
 GameListWidget.o: ../src/cpp/GameListWidget.cpp ../src/headers/GameListWidget.h \
 		../src/headers/ControllerManager.h \
-		../src/headers/EmulatorConfig.h \
-		../src/headers/Constants.h
+		../src/headers/Constants.h \
+		../src/headers/EmulatorConfig.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o GameListWidget.o ../src/cpp/GameListWidget.cpp
+
+PowerMenuWidget.o: ../src/cpp/PowerMenuWidget.cpp ../src/headers/PowerMenuWidget.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o PowerMenuWidget.o ../src/cpp/PowerMenuWidget.cpp
 
 EmulatorConfig.o: ../src/cpp/EmulatorConfig.cpp ../src/headers/EmulatorConfig.h \
 		../src/headers/Constants.h
@@ -479,6 +495,9 @@ moc_Carousel.o: moc_Carousel.cpp
 
 moc_GameListWidget.o: moc_GameListWidget.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_GameListWidget.o moc_GameListWidget.cpp
+
+moc_PowerMenuWidget.o: moc_PowerMenuWidget.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_PowerMenuWidget.o moc_PowerMenuWidget.cpp
 
 ####### Install
 
