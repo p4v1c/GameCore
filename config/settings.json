@@ -11,8 +11,8 @@
     },
     "duckstation": {
         "name": "duckstation",
-        "path": "flatpak",
-        "args": "run org.duckstation.DuckStation -f"
+        "path": "../lib/duckstation.AppImage",
+        "args": "-fullscreen"
     },
     "melonds": {
         "name": "melonDS",
@@ -31,8 +31,8 @@
     },
     "pcsx2": {
         "name": "pcsx2",
-        "path": "flatpak",
-        "args": "run net.pcsx2.PCSX2 -f"
+        "path": "../lib/pcsx2.AppImage",
+        "args": "-fullscreen"
     },
     "ppsspp": {
         "name": "PPSSPP",
@@ -41,8 +41,8 @@
     },
     "rpcs3": {
         "name": "RPCS3",
-        "path": "flatpak",
-        "args": "run net.rpcs3.RPCS3 -f"
+        "path": "../lib/rpcs3.AppImage",
+        "args": "-fullscreen"
     },
     "citron": {
         "name": "citron",
