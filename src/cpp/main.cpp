@@ -257,19 +257,20 @@ int main(int argc, char *argv[]) {
                     qDebug() << "Impossible de trouver l'ID Flatpak dans les "
                                 "arguments. Utilisation de pkill en dernier "
                                 "recours.";
-                    QStringList args = currentProcess->arguments();
+                                 QStringList args = currentProcess->arguments();
                     if (!args.isEmpty()) {
-                      QFileInfo fileInfo(args.last());
-                      QString romName = fileInfo.fileName();
-                      if (!romName.isEmpty()) {
-                        QProcess::startDetached(
-                            "pkill", QStringList() << "-f" << romName);
-                        qDebug() << "Commande lancée: pkill -f " << romName;
-                      } else {
-                        qDebug() << "Impossible de déterminer le nom de la ROM "
-                                    "pour la terminaison.";
+                        QFileInfo fileInfo(args.last());
+                        QString romName = fileInfo.fileName();
+                    
+                        if (!romName.isEmpty()) {
+                            // On récupère juste le premier mot
+                            QString firstWord = romName.split(" ", Qt::SkipEmptyParts).first();
+                            QProcess::startDetached("pkill", QStringList() << "-f" << firstWord);
+                            qDebug() << "Commande lancée: pkill -f " << firstWord;
+                        } else {
+                            qDebug() << "Impossible de déterminer le nom de la ROM pour la terminaison.";
+                        }
                       }
-                    }
                   }
                 } else {
                   qDebug() << "L'émulateur n'est pas une application Flatpak. "
