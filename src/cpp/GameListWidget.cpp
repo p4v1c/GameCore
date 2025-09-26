@@ -89,7 +89,7 @@ void GameListWidget::scanRoms(const QString &path,
     return;
   }
 
-  QDir::Filters filters = QDir::Files | QDir::Readable | QDir::NoDotAndDotDot;
+  QDir::Filters filters = QDir::Files | QDir::Dirs | QDir::Readable | QDir::NoDotAndDotDot;
   QStringList files = dir.entryList(extensions, filters, QDir::Name);
 
   qDebug() << "[GameListWidget] Fichiers trouvés:" << files.size();
