@@ -99,3 +99,17 @@ Voici un récapitulatif des besoins par émulateur :
 
 📖 Pour obtenir ces fichiers, consultez la documentation officielle :
 👉 [Emulator Files - gametechwiki](http://emulation.gametechwiki.com/index.php/Emulator_Files)
+
+
+### Misc
+```sh
+/home/pavic/.var/app/org.azahar_emu.Azahar/config/azahar-emu/qt-config.ini
+/home/pavic/.var/app/io.github.gopher64.gopher64/config/gopher64/config.json
+/home/pavic/.var/app/io.mgba.mGBA/config/mgba/config.ini
+/home/pavic/.var/app/net.kuribo64.melonDS/config/melonDS/melonDS.toml
+/home/pavic/.var/app/org.DolphinEmu.dolphin-emu/GCPadNew.ini
+/home/pavic/.var/app/org.ppsspp.PPSSPP/config/ppsspp/PSP/SYSTEM/ppsspp.ini
+/home/pavic/.var/app/org.ppsspp.PPSSPP/config/ppsspp/PSP/SYSTEM/controls.ini
+
+/home/pavic/.local/share/duckstation/settings.ini
+```
