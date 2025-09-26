@@ -18,11 +18,11 @@ Avant de lancer l'installation, assurez-vous que votre système est configuré p
 
 ## 🚀 Installation Automatique
 
-Le script `Manjaroinstall.sh` simplifie le processus d'installation pour les systèmes **Manjaro**.
+Le script `Install-Manjaro.sh` simplifie le processus d'installation pour les systèmes **Manjaro**.
 
 ```bash
-chmod +x Manjaroinstall.sh
-./Manjaroinstall.sh
+chmod +x Install-Manjaro.sh
+./Install-Manjaro.sh
 ```
 
 
