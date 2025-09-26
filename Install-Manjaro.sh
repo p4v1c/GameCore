@@ -101,7 +101,7 @@ msg "Téléchargement et installation de Citron Emulator"
 sudo -u "$USER_NAME" mkdir -p "$GAMECORE_PATH/lib"
 curl -L --progress-bar \
   -o "$GAMECORE_PATH/lib/citron.AppImage" \
-  "https://git.citron-emu.org/api/v4/projects/1/packages/generic/Citron-Canary/0.7.0/Citron-0.7.0-anylinux-x86_64_v3.AppImage"
+  "https://github.com/pkgforge-dev/Citron-AppImage/releases/download/0.7.0-5%402025-09-22_1758526814/Citron-0.7.0-5-anylinux-x86_64.AppImage"
 
 sudo chmod +x "$GAMECORE_PATH/lib/citron.AppImage"
 
