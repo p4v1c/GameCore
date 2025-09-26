@@ -236,6 +236,12 @@ int main(int argc, char *argv[]) {
             if (isGameRunning && currentProcess) {
               if (button == SDL_CONTROLLER_BUTTON_GUIDE) {
                 QString emulatorPath = currentProcess->program();
+                QString romName;
+                QStringList args = currentProcess->arguments();
+                if (!args.isEmpty()) {
+                  QFileInfo fileInfo(args.last());
+                  romName = fileInfo.fileName();
+                }
 
                 if (emulatorPath.contains("flatpak", Qt::CaseInsensitive)) {
                   qDebug() << "L'émulateur est une application Flatpak. "
@@ -243,7 +249,7 @@ int main(int argc, char *argv[]) {
                   QString flatpakId;
                   for (const QString &arg : currentProcess->arguments()) {
                     if (arg.startsWith("org.") || arg.startsWith("io.") ||
-                    arg.startsWith("net.") || arg.startsWith("info.")) {
+                    arg.startsWith("net.") || arg.startsWith("info.")){
                       flatpakId = arg;
                       break;
                     }
@@ -257,36 +263,25 @@ int main(int argc, char *argv[]) {
                     qDebug() << "Impossible de trouver l'ID Flatpak dans les "
                                 "arguments. Utilisation de pkill en dernier "
                                 "recours.";
-                                 QStringList args = currentProcess->arguments();
-                    if (!args.isEmpty()) {
-                        QFileInfo fileInfo(args.last());
-                        QString romName = fileInfo.fileName();
-                    
-                        if (!romName.isEmpty()) {
-                            // On récupère juste le premier mot
-                            QString firstWord = romName.split(" ", Qt::SkipEmptyParts).first();
-                            QProcess::startDetached("pkill", QStringList() << "-f" << firstWord);
-                            qDebug() << "Commande lancée: pkill -f " << firstWord;
-                        } else {
-                            qDebug() << "Impossible de déterminer le nom de la ROM pour la terminaison.";
-                        }
-                      }
-                  }
-                } else {
-                  qDebug() << "L'émulateur n'est pas une application Flatpak. "
-                              "Utilisation de 'pkill'.";
-                  QStringList args = currentProcess->arguments();
-                  if (!args.isEmpty()) {
-                    QFileInfo fileInfo(args.last());
-                    QString romName = fileInfo.fileName();
                     if (!romName.isEmpty()) {
-                      QProcess::startDetached("pkill", QStringList()
-                                                           << "-f" << romName);
-                      qDebug() << "Commande lancée: pkill -f " << romName;
+                      QString firstWord = romName.split(" ", Qt::SkipEmptyParts).first();
+                      QProcess::startDetached("pkill", QStringList() << "-f" << firstWord);
+                      qDebug() << "Commande lancée: pkill -f " << firstWord;
                     } else {
                       qDebug() << "Impossible de déterminer le nom de la ROM "
                                   "pour la terminaison.";
                     }
+                  }
+                } else {
+                  qDebug() << "L'émulateur n'est pas une application Flatpak. "
+                              "Utilisation de 'pkill'.";
+                  if (!romName.isEmpty()) {
+                    QString firstWord = romName.split(" ", Qt::SkipEmptyParts).first();
+                    QProcess::startDetached("pkill", QStringList() << "-f" << firstWord);
+                    qDebug() << "Commande lancée: pkill -f " << firstWord;
+                  } else {
+                    qDebug() << "Impossible de déterminer le nom de la ROM "
+                                "pour la terminaison.";
                   }
                 }
               }
