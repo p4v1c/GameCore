@@ -85,10 +85,7 @@ if ! flatpak remote-list | grep -q flathub; then
 fi
 
 flatpak install -y flathub org.azahar_emu.Azahar
-flatpak install -y flathub net.rpcs3.RPCS3
-flatpak install -y flathub net.pcsx2.PCSX2
 flatpak install -y flathub org.DolphinEmu.dolphin-emu
-flatpak install -y flathub org.duckstation.DuckStation
 flatpak install -y flathub net.kuribo64.melonDS
 flatpak install -y flathub io.github.gopher64.gopher64
 flatpak install -y flathub io.mgba.mGBA
