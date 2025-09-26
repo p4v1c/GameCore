@@ -7,7 +7,7 @@
     "dolphin": {
         "name": "Dolphin",
         "path": "flatpak",
-        "args": "run org.DolphinEmu.dolphin-emu -f"
+        "args": "run org.DolphinEmu.dolphin-emu -b"
     },
     "duckstation": {
         "name": "duckstation",
